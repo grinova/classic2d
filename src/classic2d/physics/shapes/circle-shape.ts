@@ -3,19 +3,17 @@ import { MassData } from 'classic2d/physics/mass-data';
 import { Shape, ShapeType } from 'classic2d/physics/shapes/shape';
 
 export class CircleShape implements Shape {
-  position: Vec2 = new Vec2(0, 0);
   radius: number = 1;
 
   clone(): CircleShape {
     const shape = new CircleShape();
-    shape.position = Vec2.copy(this.position);
     shape.radius = this.radius;
     return shape;
   }
 
   computeMass(density: number): MassData {
     const mass = density * 2 * Math.PI * this.radius;
-    const center = Vec2.copy(this.position);
+    const center = new Vec2();
     return { mass, center };
   }
 

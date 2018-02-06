@@ -2,7 +2,6 @@ import { Vec2 } from 'classic2d/math/common';
 import { BodyDef } from 'classic2d/physics/body-def';
 import { FixtureDef } from 'classic2d/physics/fixture-def';
 import { CircleShape } from 'classic2d/physics/shapes/circle-shape';
-import { PolygonShape } from 'classic2d/physics/shapes/polygon-shape';
 import { World } from 'classic2d/physics/world';
 import { Camera, DebugDraw } from 'sandbox/debug-draw';
 import { MovingAverage } from 'sandbox/moving-average';
@@ -10,7 +9,6 @@ import { MovingAverage } from 'sandbox/moving-average';
 function createBodies(world: World): void {
   {
     const shape = new CircleShape();
-    shape.position = new Vec2();
     shape.radius = 0.5;
 
     const fd: FixtureDef = { shape, density: 1.0 };
@@ -24,26 +22,13 @@ function createBodies(world: World): void {
     const body = world.createBody(bd);
     body.force.set(0.1, 0);
 
-    body.createFixture(fd);
+    body.setFixture(fd);
   }
 
   {
-    const shape1 = new PolygonShape();
-    shape1.vertices.push(
-      ...[[-0.5, 0.5], [0.5, 0.5], [0, 1]].map(([x, y]) => new Vec2(x, y))
-    );
-    const fd1 = { shape: shape1, density: 0.5 };
-
-    const shape2 = new PolygonShape();
-    shape2.vertices.push(
-      ...[[-0.5, -0.5], [-0.5, 0.5], [0.5, 0.5], [0.5, -0.5]].map(([x, y]) => new Vec2(x, y))
-    );
-    const fd2 = { shape: shape2, density: 1.0 };
-
-    const shape3 = new CircleShape();
-    shape3.position.set(0, -1);
-    shape3.radius = 0.5;
-    const fd3 = { shape: shape3, density: 1.0 };
+    const shape = new CircleShape();
+    shape.radius = 0.5;
+    const fd = { shape: shape, density: 1.0 };
 
     const bd: BodyDef = {
       position: new Vec2(),
@@ -53,7 +38,7 @@ function createBodies(world: World): void {
     };
     const body = world.createBody(bd);
 
-    [fd1, fd2, fd3].forEach(fd => body.createFixture(fd));
+    body.setFixture(fd);
   }
 }
 

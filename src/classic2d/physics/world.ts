@@ -1,12 +1,10 @@
-import { mat4 } from 'gl-matrix';
 import { Color, COLORS } from 'classic2d/common/color';
 import { Draw } from 'classic2d/graphics/common/draw';
-import { Transform, Vec2 } from 'classic2d/math/common';
+import { Transform, Vec2, Mat4 } from 'classic2d/math/common';
 import { Body } from 'classic2d/physics/body';
 import { BodyDef } from 'classic2d/physics/body-def';
 import { Fixture } from 'classic2d/physics/fixture';
 import { CircleShape } from 'classic2d/physics/shapes/circle-shape';
-import { PolygonShape } from 'classic2d/physics/shapes/polygon-shape';
 import { ShapeType } from 'classic2d/physics/shapes/shape';
 
 export class World {
@@ -33,11 +31,9 @@ export class World {
   drawDebugData(): void {
     this.bodies.forEach(body => {
       const matrix = body.getModelMatrix();
-      const fixtures = body.getFixtures();
-      fixtures.forEach(fixture => {
-        const color = COLORS.WHITE;
-        this.drawShape(fixture, matrix, color);
-      });
+      const fixture = body.getFixture();
+      const color = COLORS.WHITE;
+      this.drawShape(fixture, matrix, color);
     });
   }
 
@@ -69,19 +65,18 @@ export class World {
     });
   }
 
-  private drawShape(fixture: Fixture, matrix: mat4, color: Color) {
+  private drawShape(fixture: Fixture, matrix: Mat4, color: Color) {
     if (!this.draw) {
       return;
     }
     switch (fixture.getType()) {
       case ShapeType.Circle:
         const circle = fixture.getShape() as CircleShape;
-        const m = mat4.translate(mat4.create(), matrix, [circle.position.x, circle.position.y, 0]);
-        this.draw.drawCircle(m, circle.radius, color);
+        this.draw.drawCircle(matrix, circle.radius, color);
         break;
-      case ShapeType.Polygon:
-        const polygon = fixture.getShape() as PolygonShape;
-        this.draw.drawPolygon(matrix, polygon.vertices, color);
+      // case ShapeType.Polygon:
+      //   const polygon = fixture.getShape() as PolygonShape;
+      //   this.draw.drawPolygon(matrix, polygon.vertices, color);
     }
   }
 }

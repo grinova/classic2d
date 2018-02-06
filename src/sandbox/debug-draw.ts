@@ -1,8 +1,7 @@
-import { mat4 } from 'gl-matrix';
 import { Color, COLORS } from 'classic2d/common/color';
 import { Point2d } from 'classic2d/common/point';
 import { Draw } from 'classic2d/graphics/common/draw';
-import { Vec2 } from 'classic2d/math/common';
+import { Vec2, Mat4 } from 'classic2d/math/common';
 import { Exception } from 'sandbox/common/common';
 
 const vsSource = `
@@ -65,27 +64,18 @@ export class Camera {
     this.height = height;
   }
 
-  buildProjectionMatrix(): mat4 {
-    const zNear = 0.1;
-    const zFar = 100.0;
-    const projection = mat4.create();
+  buildProjectionMatrix(): Mat4 {
+    const near = 0.1;
+    const far = 100.0;
     const right = this.width / (2 * Camera.K);
     const left = -right;
     const top = this.height / (2 * Camera.K);
     const bottom = -top;
-    mat4.ortho(projection, left, right, bottom, top, zNear, zFar);
-    mat4.translate(
-      projection,
-      projection,
-      [0, 0, -10]
-    );
+    const projection = Mat4.ortho(left, right, bottom, top, near, far);
+    projection.translate(0, 0, -10);
     const z = Math.pow(Camera.ZOOM_K, this.zoom);
-    mat4.scale(projection, projection, [z, z, z]);
-    mat4.translate(
-      projection,
-      projection,
-      [-this.center.x, -this.center.y, 0]
-    );
+    projection.scale(z, z, z);
+    projection.translate(-this.center.x, -this.center.y);
     return projection;
   }
 
@@ -107,7 +97,7 @@ class RenderLines {
 
   private vertices = new Float32Array(RenderLines.MAX_VERTICES);
   private count = 0;
-  private matrices = new Array<{ matrix: mat4, offset: number, count: number }>(RenderLines.MAX_MATRICES);
+  private matrices = new Array<{ matrix: Mat4, offset: number, count: number }>(RenderLines.MAX_MATRICES);
   private indices = new Uint16Array(RenderLines.MAX_VERTICES / 2);
   private matricesCount = 0;
 
@@ -148,7 +138,7 @@ class RenderLines {
     }
   }
 
-  addVertices(matrix: mat4, ps: Vec2[], color: Color): void {
+  addVertices(matrix: Mat4, ps: Vec2[], color: Color): void {
     let lastVertices = this.count;
     for (let i = 0; i < ps.length; i++) {
       if (this.count === RenderLines.MAX_VERTICES) {
@@ -241,7 +231,7 @@ class RenderText {
 }
 
 interface Model {
-  matrix: mat4;
+  matrix: Mat4;
   lines: RenderLines;
 }
 
@@ -272,7 +262,7 @@ export class DebugDraw implements Draw {
     this.text = new RenderText(this.gl2d, textSize);
   }
 
-  drawPolygon(matrix: mat4, vertices: Vec2[], color: Color): void {
+  drawPolygon(matrix: Mat4, vertices: Vec2[], color: Color): void {
     const ps: Vec2[] = [];
     for (let i = 0; i < vertices.length; i++) {
       const p1 = vertices[i];
@@ -282,7 +272,7 @@ export class DebugDraw implements Draw {
     this.lines.addVertices(matrix, ps, color);
   }
 
-  drawCircle(matrix: mat4, radius: number, color: Color): void {
+  drawCircle(matrix: Mat4, radius: number, color: Color): void {
     const ps: Vec2[] = [];
     const f = Math.PI / 2;
     const x = radius * Math.cos(f);
@@ -301,7 +291,7 @@ export class DebugDraw implements Draw {
     this.lines.addVertices(matrix, ps, color);
   }
 
-  drawSegment(matrix: mat4, p1: Vec2, p2: Vec2, color: Color): void {
+  drawSegment(matrix: Mat4, p1: Vec2, p2: Vec2, color: Color): void {
     this.lines.addVertices(matrix, [p1, p2], color);
   }
 

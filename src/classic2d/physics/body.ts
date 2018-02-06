@@ -1,5 +1,4 @@
-import { mat4, vec3 } from 'gl-matrix';
-import { Sweep, Transform, Vec2 } from 'classic2d/math/common';
+import { Sweep, Transform, Vec2, Mat4 } from 'classic2d/math/common';
 import { BodyDef } from 'classic2d/physics/body-def';
 import { Fixture } from 'classic2d/physics/fixture';
 import { FixtureDef } from 'classic2d/physics/fixture-def';
@@ -12,7 +11,7 @@ export class Body {
   sweep: Sweep = new Sweep();
 
   private massData: MassData;
-  private fixtures: Set<Fixture> = new Set<Fixture>();
+  private fixture: Fixture;
   private xf: Transform;
 
   constructor(def: BodyDef) {
@@ -23,34 +22,35 @@ export class Body {
     this.angularVelocity = def.angularVelocity;
   }
 
-  createFixture(def: FixtureDef): Fixture {
-    const fixture = new Fixture(def);
-    this.fixtures.add(fixture);
-    if (fixture.getDensity() > 0) {
+  setFixture(def: FixtureDef): Fixture {
+    this.fixture = new Fixture(def);
+    if (this.fixture.getDensity() > 0) {
       this.resetMassData();
     }
-    return fixture;
+    return this.fixture;
   }
 
-  destroyFixture(fixture: Fixture): void {
-    if (this.fixtures.delete(fixture) && fixture.getDensity() > 0) {
+  destroyFixture(): void {
+    const density = this.fixture.getDensity();
+    this.fixture = undefined;
+    if (density > 0) {
       this.resetMassData();
     }
   }
 
-  getFixtures(): Set<Fixture> {
-    return this.fixtures;
+  getFixture(): Fixture {
+    return this.fixture;
   }
 
   getMassData(): MassData {
     return this.massData;
   }
 
-  getModelMatrix(): mat4 {
-    const matrix = mat4.create();
+  getModelMatrix(): Mat4 {
+    const matrix = new Mat4();
     const { pos/* , rot */ } = this.xf;
-    mat4.translate(matrix, matrix, vec3.fromValues(pos.x, pos.y, 0));
-    mat4.rotate(matrix, matrix, this.sweep.a, [0, 0, 1]);
+    matrix.translate(pos.x, pos.y);
+    matrix.rotate(this.sweep.a, [0, 0, 1]);
     return matrix;
   }
 
@@ -73,12 +73,10 @@ export class Body {
       this.massData.mass = 0;
       this.massData.center.set(0, 0);
     }
-    this.fixtures.forEach(fixture => {
-      const massData = fixture.getMassData();
-      const center = Vec2.copy(massData.center);
-      this.massData.mass += massData.mass;
-      this.massData.center.add(center.mul(massData.mass));
-    });
+    const massData = this.fixture.getMassData();
+    const center = Vec2.copy(massData.center);
+    this.massData.mass += massData.mass;
+    this.massData.center.add(center.mul(massData.mass));
     this.massData.center.mul(1.0 / this.massData.mass);
   }
 }
