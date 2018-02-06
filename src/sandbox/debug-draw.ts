@@ -87,17 +87,17 @@ export class Camera {
   }
 }
 
-class RenderLines {
+class RenderLine {
   private static readonly MAX_VERTICES = 1024;
   private static readonly MAX_MATRICES = 512;
 
   private gl: WebGLRenderingContext;
   private camera: Camera;
 
-  private vertices = new Float32Array(RenderLines.MAX_VERTICES);
+  private vertices = new Float32Array(RenderLine.MAX_VERTICES);
   private count = 0;
-  private matrices = new Array<{ matrix: Mat4, offset: number, count: number }>(RenderLines.MAX_MATRICES);
-  private indices = new Uint16Array(RenderLines.MAX_VERTICES / 2);
+  private matrices = new Array<{ matrix: Mat4, offset: number, count: number }>(RenderLine.MAX_MATRICES);
+  private indices = new Uint16Array(RenderLine.MAX_VERTICES / 2);
   private matricesCount = 0;
 
   private positionBuffer: WebGLBuffer;
@@ -132,7 +132,7 @@ class RenderLines {
       }
     };
 
-    for (let i = 0; i < RenderLines.MAX_VERTICES / 2; i++) {
+    for (let i = 0; i < RenderLine.MAX_VERTICES / 2; i++) {
       this.indices[i] = i;
     }
   }
@@ -140,7 +140,7 @@ class RenderLines {
   addVertices(matrix: Mat4, ps: Vec2[], color: Color): void {
     let lastVertices = this.count;
     for (let i = 0; i < ps.length; i++) {
-      if (this.count === RenderLines.MAX_VERTICES) {
+      if (this.count === RenderLine.MAX_VERTICES) {
         if (i > 0) {
           this.matrices[this.matricesCount++] = { matrix, offset: lastVertices / 2, count: (this.count - lastVertices) / 2 };
           lastVertices = this.count;
@@ -180,6 +180,113 @@ class RenderLines {
       // FIXME: Магическое число 2 - это размер в байтах типа gl.UNSIGNED_SHORT
       gl.drawElements(gl.LINES, matrix.count, gl.UNSIGNED_SHORT, matrix.offset * 2);
     }
+
+    gl.useProgram(null);
+
+    this.count = 0;
+    this.matricesCount = 0;
+  }
+}
+
+class RenderPoint {
+  private static readonly MAX_VERTICES = 1024;
+
+  private gl: WebGLRenderingContext;
+  private camera: Camera;
+
+  private vertices = new Float32Array(RenderPoint.MAX_VERTICES);
+  private count = 0;
+  private indices = new Uint16Array(RenderPoint.MAX_VERTICES / 2);
+  private matrices = new Array<Mat4>(RenderPoint.MAX_VERTICES);
+  private matricesCount = 0;
+
+  private vertexBuffer: WebGLBuffer;
+  private indexBuffer: WebGLBuffer;
+
+  private programInfo: {
+    program: WebGLProgram,
+    attribLocations: {
+      vertexPosition: number;
+    },
+    uniformLocations: {
+      projectionMatrix: WebGLUniformLocation,
+      modelViewMatrix: WebGLUniformLocation
+    }
+  };
+
+  constructor(gl: WebGLRenderingContext, camera: Camera) {
+    this.gl = gl;
+    this.camera = camera;
+    this.vertexBuffer = gl.createBuffer();
+    this.indexBuffer = gl.createBuffer();
+
+    const vsSource = `
+attribute vec4 aVertexPosition;
+
+uniform mat4 uModelViewMatrix;
+uniform mat4 uProjectionMatrix;
+
+void main(void) {
+  gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+  gl_PointSize = 4.0;
+}
+    `;
+    const program = initShaderProgram(gl, vsSource, fsSource);
+    this.programInfo = {
+      program,
+      attribLocations: {
+        vertexPosition: gl.getAttribLocation(program, 'aVertexPosition')
+      },
+      uniformLocations: {
+        projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix'),
+        modelViewMatrix: gl.getUniformLocation(program, 'uModelViewMatrix')
+      }
+    };
+
+    for (let i = 0; i < RenderPoint.MAX_VERTICES / 2; i++) {
+      this.indices[i] = i;
+    }
+  }
+
+  vertex(matrix: Mat4, vertex: Vec2, color: Color): void {
+    const lastVertices = this.count;
+    if (this.count === RenderPoint.MAX_VERTICES) {
+      this.flush();
+    }
+    this.vertices[this.count++] = vertex.x;
+    this.vertices[this.count++] = vertex.y;
+    this.matrices[this.matricesCount++] = matrix;
+  }
+
+  flush(): void {
+    if (this.matricesCount === 0) {
+      return;
+    }
+
+    const { gl, vertices, indices, vertexBuffer, indexBuffer, programInfo } = this;
+    const projectionMatrix = this.camera.buildProjectionMatrix();
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(
+      programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.useProgram(programInfo.program);
+    gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+
+    for (let i = 0; i < this.matricesCount; i++) {
+      const matrix = this.matrices[i];
+      gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, matrix);
+      // FIXME: Магическое число 2 - это размер в байтах типа gl.UNSIGNED_SHORT
+      gl.drawElements(gl.POINTS, 1, gl.UNSIGNED_SHORT, i * 2);
+    }
+
+    gl.useProgram(null);
 
     this.count = 0;
     this.matricesCount = 0;
@@ -231,7 +338,7 @@ class RenderText {
 
 interface Model {
   matrix: Mat4;
-  lines: RenderLines;
+  lines: RenderLine;
 }
 
 export interface Options {
@@ -244,8 +351,9 @@ export class DebugDraw implements Draw {
   private gl: WebGLRenderingContext;
   private gl2d: CanvasRenderingContext2D;
   private camera: Camera;
-  private lines: RenderLines;
+  private lines: RenderLine;
   private text: RenderText;
+  private points: RenderPoint;
 
   constructor(
     gl: WebGLRenderingContext,
@@ -256,7 +364,8 @@ export class DebugDraw implements Draw {
     this.gl = gl;
     this.gl2d = gl2d;
     this.camera = camera;
-    this.lines = new RenderLines(this.gl, this.camera);
+    this.lines = new RenderLine(this.gl, this.camera);
+    this.points = new RenderPoint(this.gl, this.camera);
     const textSize = options && options.textSize;
     this.text = new RenderText(this.gl2d, textSize);
   }
@@ -288,10 +397,15 @@ export class DebugDraw implements Draw {
     }
     this.drawSegment(matrix, new Vec2(), ps[0], color);
     this.lines.addVertices(matrix, ps, color);
+    this.drawPoint(matrix, new Vec2(), color);
   }
 
   drawSegment(matrix: Mat4, p1: Vec2, p2: Vec2, color: Color): void {
     this.lines.addVertices(matrix, [p1, p2], color);
+  }
+
+  drawPoint(matrix: Mat4, vertex: Vec2, color: Color): void {
+    this.points.vertex(matrix, vertex, color);
   }
 
   drawText(text: string, x: number, y: number): void {
@@ -314,5 +428,6 @@ export class DebugDraw implements Draw {
 
     this.lines.flush();
     this.text.flush();
+    this.points.flush();
   }
 }
