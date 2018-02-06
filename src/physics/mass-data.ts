@@ -1,6 +1,6 @@
-import { vec2 } from 'gl-matrix';
+import { Vec2 } from 'math/common';
 
 export interface MassData {
   mass: number;
-  center: vec2;
+  center: Vec2;
 }

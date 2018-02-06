@@ -1,8 +1,8 @@
-import { vec2 } from 'gl-matrix';
+import { Vec2 } from 'math/common';
 
 export interface BodyDef {
-  position: vec2;
+  position: Vec2;
   angle: number;
-  linearVelocity: vec2;
+  linearVelocity: Vec2;
   angularVelocity: number;
 }

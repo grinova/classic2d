@@ -1,4 +1,3 @@
-import { vec2 } from 'gl-matrix';
 import { MassData } from 'physics/mass-data';
 
 export enum ShapeType {

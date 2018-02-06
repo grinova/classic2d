@@ -1,4 +1,4 @@
-import { mat4, vec2, vec3 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 import { Sweep, Transform, Vec2 } from 'math/common';
 import { BodyDef } from 'physics/body-def';
 import { Fixture } from 'physics/fixture';
@@ -6,9 +6,9 @@ import { FixtureDef } from 'physics/fixture-def';
 import { MassData } from 'physics/mass-data';
 
 export class Body {
-  linearVelocity: vec2;
+  linearVelocity: Vec2;
   angularVelocity: number;
-  force: vec2 = vec2.fromValues(0, 0);
+  force: Vec2 = new Vec2();
   sweep: Sweep = new Sweep();
 
   private massData: MassData;
@@ -16,10 +16,10 @@ export class Body {
   private xf: Transform;
 
   constructor(def: BodyDef) {
-    this.sweep.c = new Vec2(def.position[0], def.position[1]);
+    this.sweep.c = Vec2.copy(def.position);
     this.sweep.a = def.angle;
     this.xf = new Transform(Vec2.copy(this.sweep.c), def.angle);
-    this.linearVelocity = def.linearVelocity;
+    this.linearVelocity = Vec2.copy(def.linearVelocity);
     this.angularVelocity = def.angularVelocity;
   }
 
@@ -54,8 +54,8 @@ export class Body {
     return matrix;
   }
 
-  getPosition(): vec2 {
-    return vec2.fromValues(this.sweep.c.x, this.sweep.c.y);
+  getPosition(): Vec2 {
+    return Vec2.copy(this.sweep.c);
   }
 
   // setTransform(position: vec2, angle: number): void {
@@ -68,25 +68,17 @@ export class Body {
 
   private resetMassData(): void {
     if (!this.massData) {
-      this.massData = { mass: 0, center: vec2.fromValues(0, 0) };
+      this.massData = { mass: 0, center: new Vec2() };
     } else {
       this.massData.mass = 0;
-      vec2.set(this.massData.center, 0, 0);
+      this.massData.center.set(0, 0);
     }
-    const center = vec2.create();
     this.fixtures.forEach(fixture => {
       const massData = fixture.getMassData();
+      const center = Vec2.copy(massData.center);
       this.massData.mass += massData.mass;
-      vec2.add(
-        this.massData.center,
-        this.massData.center,
-        vec2.scale(
-          center,
-          massData.center,
-          massData.mass
-        )
-      );
+      this.massData.center.add(center.mul(massData.mass));
     });
-    vec2.scale(this.massData.center, this.massData.center, 1.0 / this.massData.mass);
+    this.massData.center.mul(1.0 / this.massData.mass);
   }
 }

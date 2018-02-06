@@ -1,14 +1,4 @@
-export module List {
-  export type Comparator<T> = (a: T, b: T) => boolean;
-
-  export function diff<T>(a: T[], b: T[], comparator: Comparator<T>): T[] {
-    return a.filter(aValue => {
-      return b.every(bValue => !comparator(aValue, bValue));
-    });
-  }
-}
-
-export module Exception {
+export namespace Exception {
   export class Exception {
     private msg: string;
 

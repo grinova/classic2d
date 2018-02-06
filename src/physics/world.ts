@@ -1,7 +1,7 @@
-import { Color, Colors } from 'common/color';
-import { mat4, vec2 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
+import { Color, COLORS } from 'common/color';
 import { Draw } from 'graphics/common/draw';
-import { Transform } from 'math/common';
+import { Transform, Vec2 } from 'math/common';
 import { Body } from 'physics/body';
 import { BodyDef } from 'physics/body-def';
 import { Fixture } from 'physics/fixture';
@@ -16,7 +16,7 @@ export class World {
 
   clearForces(): void {
     this.bodies.forEach(body => {
-      vec2.set(body.force, 0, 0);
+      body.force.set(0, 0);
     });
   }
 
@@ -35,7 +35,7 @@ export class World {
       const matrix = body.getModelMatrix();
       const fixtures = body.getFixtures();
       fixtures.forEach(fixture => {
-        const color = Colors.WHITE;
+        const color = COLORS.WHITE;
         this.drawShape(fixture, matrix, color);
       });
     });
@@ -53,18 +53,17 @@ export class World {
     const T = time / 1000;
     this.bodies.forEach(body => {
       const mass = body.getMassData().mass;
-      const acceleration = vec2.scale(vec2.create(), body.force, T);
-      const velocityWay = vec2.create();
-      vec2.scale(velocityWay, body.linearVelocity, T);
-      const asselerationWay = vec2.create();
-      vec2.scale(asselerationWay, acceleration, Math.pow(T, 2) / 2);
+      const acceleration = Vec2.copy(body.force).mul(T);
+      const velocityWay = Vec2.copy(body.linearVelocity).mul(T);
+      const asselerationWay = Vec2.copy(acceleration);
+      asselerationWay.mul(Math.pow(T, 2) / 2);
       const pos = body.getPosition();
-      vec2.add(pos, pos, velocityWay);
-      vec2.add(pos, pos, asselerationWay);
+      pos.add(velocityWay);
+      pos.add(asselerationWay);
       const angle = body.angularVelocity * T;
 
-      vec2.add(body.linearVelocity, body.linearVelocity, acceleration);
-      body.sweep.c.set(pos[0], pos[1]);
+      body.linearVelocity.add(acceleration);
+      body.sweep.c.set(pos.x, pos.y);
       body.sweep.a += angle;
       body.synchronize();
     });
@@ -76,14 +75,13 @@ export class World {
     }
     switch (fixture.getType()) {
       case ShapeType.Circle:
-        const circle = <CircleShape>fixture.getShape();
-        const m = mat4.translate(mat4.create(), matrix, [circle.position[0], circle.position[1], 0]);
+        const circle = fixture.getShape() as CircleShape;
+        const m = mat4.translate(mat4.create(), matrix, [circle.position.x, circle.position.y, 0]);
         this.draw.drawCircle(m, circle.radius, color);
         break;
       case ShapeType.Polygon:
-        const polygon = <PolygonShape>fixture.getShape();
+        const polygon = fixture.getShape() as PolygonShape;
         this.draw.drawPolygon(matrix, polygon.vertices, color);
-      default:
     }
   }
 }

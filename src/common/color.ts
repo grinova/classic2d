@@ -1,5 +1,5 @@
 export type Color = string;
 
-export const Colors: { [name: string]: Color } = {
+export const COLORS: { [name: string]: Color } = {
   WHITE: '#FFFFFF'
 };
