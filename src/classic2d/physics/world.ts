@@ -1,13 +1,13 @@
 import { mat4 } from 'gl-matrix';
-import { Color, COLORS } from 'common/color';
-import { Draw } from 'graphics/common/draw';
-import { Transform, Vec2 } from 'math/common';
-import { Body } from 'physics/body';
-import { BodyDef } from 'physics/body-def';
-import { Fixture } from 'physics/fixture';
-import { CircleShape } from 'physics/shapes/circle-shape';
-import { PolygonShape } from 'physics/shapes/polygon-shape';
-import { ShapeType } from 'physics/shapes/shape';
+import { Color, COLORS } from 'classic2d/common/color';
+import { Draw } from 'classic2d/graphics/common/draw';
+import { Transform, Vec2 } from 'classic2d/math/common';
+import { Body } from 'classic2d/physics/body';
+import { BodyDef } from 'classic2d/physics/body-def';
+import { Fixture } from 'classic2d/physics/fixture';
+import { CircleShape } from 'classic2d/physics/shapes/circle-shape';
+import { PolygonShape } from 'classic2d/physics/shapes/polygon-shape';
+import { ShapeType } from 'classic2d/physics/shapes/shape';
 
 export class World {
   private bodies: Set<Body> = new Set<Body>();

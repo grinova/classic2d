@@ -4,8 +4,8 @@
   "description": "",
   "main": "webpack.config.js",
   "scripts": {
-    "build": "./node_modules/.bin/webpack",
-    "watch": "./node_modules/.bin/webpack --watch",
+    "sandbox:build": "./node_modules/.bin/webpack",
+    "sandbox:watch": "./node_modules/.bin/webpack --watch",
     "test": "tests"
   },
   "repository": {

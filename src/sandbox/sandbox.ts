@@ -1,9 +1,9 @@
-import { World } from 'classic2d';
-import { Vec2 } from 'math/common';
-import { BodyDef } from 'physics/body-def';
-import { FixtureDef } from 'physics/fixture-def';
-import { CircleShape } from 'physics/shapes/circle-shape';
-import { PolygonShape } from 'physics/shapes/polygon-shape';
+import { Vec2 } from 'classic2d/math/common';
+import { BodyDef } from 'classic2d/physics/body-def';
+import { FixtureDef } from 'classic2d/physics/fixture-def';
+import { CircleShape } from 'classic2d/physics/shapes/circle-shape';
+import { PolygonShape } from 'classic2d/physics/shapes/polygon-shape';
+import { World } from 'classic2d/physics/world';
 import { Camera, DebugDraw } from 'sandbox/debug-draw';
 import { MovingAverage } from 'sandbox/moving-average';
 

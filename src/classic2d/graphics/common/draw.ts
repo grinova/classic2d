@@ -1,6 +1,6 @@
 import { mat4 } from 'gl-matrix';
-import { Color } from 'common/color';
-import { Vec2 } from 'math/common';
+import { Color } from 'classic2d/common/color';
+import { Vec2 } from 'classic2d/math/common';
 
 export interface Draw {
   drawPolygon(m: mat4, vertices: Vec2[], color: Color): void;

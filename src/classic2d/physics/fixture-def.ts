@@ -1,4 +1,4 @@
-import { Shape } from 'physics/shapes/shape';
+import { Shape } from 'classic2d/physics/shapes/shape';
 
 export interface FixtureDef {
   shape: Shape;

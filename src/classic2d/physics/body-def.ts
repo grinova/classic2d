@@ -1,4 +1,4 @@
-import { Vec2 } from 'math/common';
+import { Vec2 } from 'classic2d/math/common';
 
 export interface BodyDef {
   position: Vec2;

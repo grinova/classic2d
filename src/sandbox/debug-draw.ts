@@ -1,9 +1,9 @@
 import { mat4 } from 'gl-matrix';
-import { Color, COLORS } from 'common/color';
-import { Exception } from 'common/common';
-import { Point2d } from 'common/point';
-import { Draw } from 'graphics/common/draw';
-import { Vec2 } from 'math/common';
+import { Color, COLORS } from 'classic2d/common/color';
+import { Point2d } from 'classic2d/common/point';
+import { Draw } from 'classic2d/graphics/common/draw';
+import { Vec2 } from 'classic2d/math/common';
+import { Exception } from 'sandbox/common/common';
 
 const vsSource = `
 attribute vec4 aVertexPosition;

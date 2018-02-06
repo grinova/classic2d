@@ -1,6 +1,6 @@
-import { FixtureDef } from 'physics/fixture-def';
-import { MassData } from 'physics/mass-data';
-import { Shape, ShapeType } from 'physics/shapes/shape';
+import { FixtureDef } from 'classic2d/physics/fixture-def';
+import { MassData } from 'classic2d/physics/mass-data';
+import { Shape, ShapeType } from 'classic2d/physics/shapes/shape';
 
 export class Fixture {
   private shape: Shape;

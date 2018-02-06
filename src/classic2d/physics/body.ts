@@ -1,9 +1,9 @@
 import { mat4, vec3 } from 'gl-matrix';
-import { Sweep, Transform, Vec2 } from 'math/common';
-import { BodyDef } from 'physics/body-def';
-import { Fixture } from 'physics/fixture';
-import { FixtureDef } from 'physics/fixture-def';
-import { MassData } from 'physics/mass-data';
+import { Sweep, Transform, Vec2 } from 'classic2d/math/common';
+import { BodyDef } from 'classic2d/physics/body-def';
+import { Fixture } from 'classic2d/physics/fixture';
+import { FixtureDef } from 'classic2d/physics/fixture-def';
+import { MassData } from 'classic2d/physics/mass-data';
 
 export class Body {
   linearVelocity: Vec2;

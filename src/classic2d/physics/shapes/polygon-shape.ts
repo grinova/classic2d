@@ -1,6 +1,6 @@
-import { Vec2 } from 'math/common';
-import { MassData } from 'physics/mass-data';
-import { Shape, ShapeType } from 'physics/shapes/shape';
+import { Vec2 } from 'classic2d/math/common';
+import { MassData } from 'classic2d/physics/mass-data';
+import { Shape, ShapeType } from 'classic2d/physics/shapes/shape';
 
 export class PolygonShape implements Shape {
   vertices: Vec2[] = [];
