@@ -1,5 +1,4 @@
 import { Color, COLORS } from 'classic2d/common/color';
-import { Point2d } from 'classic2d/common/point';
 import { Draw } from 'classic2d/graphics/common/draw';
 import { Vec2, Mat4 } from 'classic2d/math/common';
 import { Exception } from 'sandbox/common/common';
@@ -52,13 +51,13 @@ export class Camera {
   private static readonly K = 100;
   private static readonly ZOOM_K = 10 / 9;
 
-  center: Point2d;
+  center: Vec2;
   zoom: number;
   width: number;
   height: number;
 
-  constructor(center: Point2d, zoom: number, width: number, height: number) {
-    this.center = center;
+  constructor(x: number, y: number, zoom: number, width: number, height: number) {
+    this.center = new Vec2(x, y);
     this.zoom = zoom;
     this.width = width;
     this.height = height;
@@ -79,7 +78,7 @@ export class Camera {
     return projection;
   }
 
-  move(offset: Point2d): void {
+  move(offset: Vec2): void {
     const x = offset.x / Camera.K;
     const y = offset.y / Camera.K;
     const z = Math.pow(Camera.ZOOM_K, this.zoom);

@@ -65,7 +65,7 @@ window.onload = () => {
   setSize(canvasWebgl, width, height);
   setSize(canvas2d, width, height);
 
-  const camera = new Camera({ x: 0, y: 0 }, 0, width, height);
+  const camera = new Camera(0, 0, 0, width, height);
   const world = new World();
   resetWorld(world);
 
