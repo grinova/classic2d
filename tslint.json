@@ -1,0 +1,12 @@
+{
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint-config-standard"
+  ],
+  "rules": {
+    "semicolon": [true, "always", "ignore-bound-class-methods"],
+    "member-ordering": false,
+    "space-before-function-paren": false
+  },
+  "rulesDirectory": []
+}
