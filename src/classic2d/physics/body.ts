@@ -1,8 +1,9 @@
-import { Sweep, Transform, Vec2, Mat4 } from 'classic2d/math/common';
+import { Mat4, Sweep, Transform, Vec2 } from 'classic2d/math/common';
 import { BodyDef } from 'classic2d/physics/body-def';
 import { Fixture } from 'classic2d/physics/fixture';
 import { FixtureDef } from 'classic2d/physics/fixture-def';
 import { MassData } from 'classic2d/physics/mass-data';
+import { CircleShape } from 'classic2d/physics/shapes/circle-shape';
 
 export class Body {
   linearVelocity: Vec2;
@@ -20,6 +21,11 @@ export class Body {
     this.xf = new Transform(Vec2.copy(this.sweep.c), def.angle);
     this.linearVelocity = Vec2.copy(def.linearVelocity);
     this.angularVelocity = def.angularVelocity;
+  }
+
+  getRadius(): number {
+    const shape = this.fixture.getShape() as CircleShape;
+    return shape.radius;
   }
 
   setFixture(def: FixtureDef): Fixture {

@@ -209,8 +209,7 @@ class RenderPoint {
       vertexPosition: number;
     },
     uniformLocations: {
-      projectionMatrix: WebGLUniformLocation,
-      modelViewMatrix: WebGLUniformLocation
+      projectionMatrix: WebGLUniformLocation
     }
   };
 
@@ -223,11 +222,10 @@ class RenderPoint {
     const vsSource = `
 attribute vec4 aVertexPosition;
 
-uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 
 void main(void) {
-  gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+  gl_Position = uProjectionMatrix * aVertexPosition;
   gl_PointSize = 4.0;
 }
     `;
@@ -238,8 +236,7 @@ void main(void) {
         vertexPosition: gl.getAttribLocation(program, 'aVertexPosition')
       },
       uniformLocations: {
-        projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix'),
-        modelViewMatrix: gl.getUniformLocation(program, 'uModelViewMatrix')
+        projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix')
       }
     };
 
@@ -248,18 +245,19 @@ void main(void) {
     }
   }
 
-  vertex(matrix: Mat4, vertex: Vec2, color: Color): void {
+  vertex(vertex: Vec2, color: Color): void {
     const lastVertices = this.count;
     if (this.count === RenderPoint.MAX_VERTICES) {
       this.flush();
     }
-    this.vertices[this.count++] = vertex.x;
-    this.vertices[this.count++] = vertex.y;
-    this.matrices[this.matricesCount++] = matrix;
+    const offset = this.count * 2;
+    this.vertices[offset] = vertex.x;
+    this.vertices[offset + 1] = vertex.y;
+    this.count++;
   }
 
   flush(): void {
-    if (this.matricesCount === 0) {
+    if (this.count === 0) {
       return;
     }
 
@@ -279,17 +277,11 @@ void main(void) {
     gl.useProgram(programInfo.program);
     gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
-    for (let i = 0; i < this.matricesCount; i++) {
-      const matrix = this.matrices[i];
-      gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, matrix);
-      // FIXME: Магическое число 2 - это размер в байтах типа gl.UNSIGNED_SHORT
-      gl.drawElements(gl.POINTS, 1, gl.UNSIGNED_SHORT, i * 2);
-    }
+    gl.drawElements(gl.POINTS, this.count, gl.UNSIGNED_SHORT, 0);
 
     gl.useProgram(null);
 
     this.count = 0;
-    this.matricesCount = 0;
   }
 }
 
@@ -397,15 +389,14 @@ export class DebugDraw implements Draw {
     }
     this.drawSegment(matrix, new Vec2(), ps[0], color);
     this.lines.addVertices(matrix, ps, color);
-    this.drawPoint(matrix, new Vec2(), color);
   }
 
   drawSegment(matrix: Mat4, p1: Vec2, p2: Vec2, color: Color): void {
     this.lines.addVertices(matrix, [p1, p2], color);
   }
 
-  drawPoint(matrix: Mat4, vertex: Vec2, color: Color): void {
-    this.points.vertex(matrix, vertex, color);
+  drawPoint(vertex: Vec2, color: Color): void {
+    this.points.vertex(vertex, color);
   }
 
   drawText(text: string, x: number, y: number): void {

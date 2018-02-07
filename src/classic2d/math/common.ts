@@ -21,6 +21,12 @@ export class Vec2 {
     return this;
   }
 
+  sub(v: Vec2): Vec2 {
+    this.x -= v.x;
+    this.y -= v.y;
+    return this;
+  }
+
   mul(a: number): Vec2 {
     this.x *= a;
     this.y *= a;
