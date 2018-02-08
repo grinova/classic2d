@@ -4,6 +4,7 @@ import { BodyDef } from 'classic2d/physics/body-def';
 import { FixtureDef } from 'classic2d/physics/fixture-def';
 import { CircleShape } from 'classic2d/physics/shapes/circle-shape';
 import { World } from 'classic2d/physics/world';
+import { ContactListener } from 'sandbox/contact-listener';
 import { Camera, DebugDraw } from 'sandbox/debug-draw';
 import { MovingAverage } from 'sandbox/moving-average';
 
@@ -76,6 +77,7 @@ window.onload = () => {
 
   const camera = new Camera(0, 0, 0, width, height);
   const world = new World();
+  world.setContactListener(new ContactListener());
   resetWorld(world);
 
   const gl = canvasWebgl.getContext('webgl') || canvasWebgl.getContext('experimental-webgl');

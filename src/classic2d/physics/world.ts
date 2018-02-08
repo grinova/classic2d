@@ -1,5 +1,6 @@
 import { Color, COLORS } from 'classic2d/common/color';
 import { ContactManager } from 'classic2d/dynamics/contact-manager';
+import { ContactListener } from 'classic2d/dynamics/worlds-callbacks';
 import { Draw } from 'classic2d/graphics/common/draw';
 import { Mat4, Transform, Vec2 } from 'classic2d/math/common';
 import { Body } from 'classic2d/physics/body';
@@ -68,6 +69,10 @@ export class World {
     return this.contactManager;
   }
 
+  setContactListener(listener: ContactListener): void {
+    this.contactManager.setContactListener(listener);
+  }
+
   setDebugDraw(draw: Draw): void {
     this.draw = draw;
   }
@@ -76,6 +81,7 @@ export class World {
     if (this.flags & Flags.newBodies) {
       this.contactManager.findNewContacts();
     }
+    this.contactManager.collide();
     const T = time / 1000;
     this.bodies.forEach(body => {
       const mass = body.getMassData().mass;
