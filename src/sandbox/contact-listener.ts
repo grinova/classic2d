@@ -1,5 +1,7 @@
-import { Contact } from 'classic2d/dynamics/contacts/contact';
-import { ContactListener as BaseContactListener } from 'classic2d/dynamics/worlds-callbacks';
+import {
+  Contact,
+  ContactListener as BaseContactListener
+} from 'classic2d/classic2d';
 
 export class ContactListener extends BaseContactListener {
   beginContact(contact: Contact): void {

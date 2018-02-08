@@ -1,6 +1,10 @@
-import { Color, COLORS } from 'classic2d/common/color';
-import { Draw } from 'classic2d/graphics/common/draw';
-import { Vec2, Mat4 } from 'classic2d/math/common';
+import {
+  Color,
+  COLORS,
+  Draw,
+  Vec2,
+  Mat4
+} from 'classic2d/classic2d';
 import { Exception } from 'sandbox/common/common';
 
 const vsSource = `

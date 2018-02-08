@@ -1,9 +1,11 @@
-import { Vec2 } from 'classic2d/math/common';
-import { Body } from 'classic2d/physics/body';
-import { BodyDef } from 'classic2d/physics/body-def';
-import { FixtureDef } from 'classic2d/physics/fixture-def';
-import { CircleShape } from 'classic2d/physics/shapes/circle-shape';
-import { World } from 'classic2d/physics/world';
+import {
+  Vec2,
+  Body,
+  BodyDef,
+  FixtureDef,
+  CircleShape,
+  World
+} from 'classic2d/classic2d';
 import { ContactListener } from 'sandbox/contact-listener';
 import { Camera, DebugDraw } from 'sandbox/debug-draw';
 import { MovingAverage } from 'sandbox/moving-average';
