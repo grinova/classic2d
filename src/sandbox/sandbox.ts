@@ -1,14 +1,107 @@
 import {
-  Vec2,
   Body,
   BodyDef,
-  FixtureDef,
   CircleShape,
+  Draw,
+  FixtureDef,
+  Vec2,
   World
 } from 'classic2d/classic2d';
+import { setCanvasSize } from 'sandbox/common/dom';
 import { ContactListener } from 'sandbox/contact-listener';
 import { Camera, DebugDraw } from 'sandbox/debug-draw';
 import { MovingAverage } from 'sandbox/moving-average';
+
+class Sandbox {
+  private canvasWebgl: HTMLCanvasElement;
+  private canvas2d: HTMLCanvasElement;
+  private camera: Camera;
+  private world: World;
+  private debugDraw: DebugDraw;
+
+  private past = 0;
+  private isPause = false;
+  private makeStep = false;
+  private frameTimeMovingAverage = new MovingAverage(60);
+
+  constructor() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    this.canvasWebgl = document.getElementById('canvas-webgl') as HTMLCanvasElement;
+    this.canvas2d = document.getElementById('canvas-2d') as HTMLCanvasElement;
+
+    setCanvasSize(this.canvasWebgl, width, height);
+    setCanvasSize(this.canvas2d, width, height);
+
+    this.camera = new Camera(0, 0, 0, width, height);
+    this.world = new World();
+    this.world.setContactListener(new ContactListener());
+    resetWorld(this.world);
+
+    const gl = this.canvasWebgl.getContext('webgl') || this.canvasWebgl.getContext('experimental-webgl');
+    const gl2d = this.canvas2d.getContext('2d');
+
+    this.debugDraw = new DebugDraw(gl, gl2d, this.camera);
+    this.world.setDebugDraw(this.debugDraw);
+
+    window.onresize = this.handleResize;
+    window.onkeydown = this.handleKeyDown;
+  }
+
+  run(): void {
+    requestAnimationFrame(this.render);
+  }
+
+  private handleResize = (): void => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    this.camera.width = width;
+    this.camera.height = height;
+
+    setCanvasSize(this.canvasWebgl, width, height);
+    setCanvasSize(this.canvas2d, width, height);
+  };
+
+  private handleKeyDown = (event: KeyboardEvent): void => {
+    switch (event.key) {
+      case 'r':
+        resetWorld(this.world);
+        break;
+      case 'p':
+        this.isPause = !this.isPause;
+        break;
+      case 'o':
+        this.makeStep = true;
+        this.isPause = true;
+        break;
+    }
+  };
+
+  private render = (now: number): void => {
+    const time = now - this.past;
+    this.past = now;
+    if (!this.isPause || this.makeStep) {
+      changePosition(time);
+      this.world.step(time);
+      this.makeStep = false;
+    }
+    this.world.drawDebugData();
+    const averageFrameTime = this.frameTimeMovingAverage.get(time);
+    const help = '[R] - reset; [P] - pause; [O] - step';
+    const fps = 'FPS: ' + Math.floor(1000 / averageFrameTime).toString();
+    const frame = 'Frame time: ' + averageFrameTime.toFixed(3).toString() + ' ms';
+    this.debugDraw.printText(help);
+    this.debugDraw.printText(fps);
+    this.debugDraw.printText(frame);
+    if (this.isPause) {
+      this.debugDraw.printText('[PAUSE]');
+    }
+    this.debugDraw.flush();
+
+    requestAnimationFrame(this.render);
+  }
+}
 
 let movingBody: Body;
 
@@ -61,87 +154,7 @@ function changePosition(time: number): void {
   movingBody.sweep.c.x = x;
 }
 
-function setSize(canvas: HTMLCanvasElement, width: number, height: number): void {
-  canvas.width = width;
-  canvas.height = height;
-  canvas.style.width = width + 'px';
-  canvas.style.height = height + 'px';
-}
-
 window.onload = () => {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-  const canvasWebgl = document.getElementById('canvas-webgl') as HTMLCanvasElement;
-  const canvas2d = document.getElementById('canvas-2d') as HTMLCanvasElement;
-
-  setSize(canvasWebgl, width, height);
-  setSize(canvas2d, width, height);
-
-  const camera = new Camera(0, 0, 0, width, height);
-  const world = new World();
-  world.setContactListener(new ContactListener());
-  resetWorld(world);
-
-  const gl = canvasWebgl.getContext('webgl') || canvasWebgl.getContext('experimental-webgl');
-  const gl2d = canvas2d.getContext('2d');
-
-  const debugDraw = new DebugDraw(gl, gl2d, camera);
-  world.setDebugDraw(debugDraw);
-
-  const frameTimeMovingAverage = new MovingAverage(60);
-
-  let isPause = false;
-  let makeStep = false;
-
-  let past = 0;
-  const render: FrameRequestCallback = now => {
-    const time = now - past;
-    past = now;
-    if (!isPause || makeStep) {
-      changePosition(time);
-      world.step(time);
-      makeStep = false;
-    }
-    world.drawDebugData();
-    const averageFrameTime = frameTimeMovingAverage.get(time);
-    const help = '[R] - reset; [P] - pause; [O] - step';
-    const fps = 'FPS: ' + Math.floor(1000 / averageFrameTime).toString();
-    const frame = 'Frame time: ' + averageFrameTime.toFixed(3).toString() + ' ms';
-    debugDraw.printText(help);
-    debugDraw.printText(fps);
-    debugDraw.printText(frame);
-    if (isPause) {
-      debugDraw.printText('[PAUSE]');
-    }
-    debugDraw.flush();
-
-    requestAnimationFrame(render);
-  };
-  requestAnimationFrame(render);
-
-  window.onresize = () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    camera.width = width;
-    camera.height = height;
-
-    setSize(canvasWebgl, width, height);
-    setSize(canvas2d, width, height);
-  };
-
-  window.onkeydown = event => {
-    switch (event.key) {
-      case 'r':
-        resetWorld(world);
-        break;
-      case 'p':
-        isPause = !isPause;
-        break;
-      case 'o':
-        makeStep = true;
-        isPause = true;
-        break;
-    }
-  };
+  const sandbox = new Sandbox();
+  sandbox.run();
 };
