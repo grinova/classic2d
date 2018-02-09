@@ -80,23 +80,23 @@ export class World {
   step(time: number): void {
     if (this.flags & Flags.newBodies) {
       this.contactManager.findNewContacts();
+      this.flags &= ~Flags.newBodies;
     }
     this.contactManager.collide();
     const T = time / 1000;
     this.bodies.forEach(body => {
-      const mass = body.getMassData().mass;
-      const acceleration = Vec2.copy(body.force).mul(T);
-      const velocityWay = Vec2.copy(body.linearVelocity).mul(T);
-      const asselerationWay = Vec2.copy(acceleration);
-      asselerationWay.mul(Math.pow(T, 2) / 2);
+      const m = body.getMassData().mass;
+      const a = Vec2.copy(body.force).mul(T);
+      const vs = Vec2.copy(body.linearVelocity).mul(T);
+      const as = Vec2.copy(a).mul(T * T / 2);
       const pos = body.getPosition();
-      pos.add(velocityWay);
-      pos.add(asselerationWay);
-      const angle = body.angularVelocity * T;
+      pos.add(vs);
+      pos.add(as);
+      const da = body.angularVelocity * T;
 
-      body.linearVelocity.add(acceleration);
+      body.linearVelocity.add(a);
       body.sweep.c.set(pos.x, pos.y);
-      body.sweep.a += angle;
+      body.sweep.a = body.getAngle() + da;
       body.synchronize();
     });
     this.contactManager.findNewContacts();

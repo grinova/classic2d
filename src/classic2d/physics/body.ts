@@ -44,6 +44,10 @@ export class Body {
     }
   }
 
+  getAngle(): number {
+    return this.xf.rot.getAngle();
+  }
+
   getFixture(): Fixture {
     return this.fixture;
   }
@@ -54,9 +58,9 @@ export class Body {
 
   getModelMatrix(): Mat4 {
     const matrix = new Mat4();
-    const { pos/* , rot */ } = this.xf;
+    const { pos, rot } = this.xf;
     matrix.translate(pos.x, pos.y);
-    matrix.rotate(this.sweep.a, [0, 0, 1]);
+    matrix.rotate(rot.getAngle());
     return matrix;
   }
 
@@ -64,12 +68,12 @@ export class Body {
     return Vec2.copy(this.sweep.c);
   }
 
-  // setTransform(position: vec2, angle: number): void {
-  //   this.xf = this.xf.set(new Vec2(position[0], position[1]), angle);
-  // }
+  setTransform(position: Vec2, angle: number): void {
+    this.xf.set(position, angle);
+  }
 
   synchronize(): void {
-    this.xf.set(this.sweep.c, this.sweep.a);
+    this.setTransform(this.sweep.c, this.sweep.a);
   }
 
   private resetMassData(): void {

@@ -68,9 +68,13 @@ export class Rot {
     this.set(angle);
   }
 
+  getAngle(): number {
+    return Math.atan2(this.s, this.c);
+  }
+
   set(angle: number): Rot {
     this.s = Math.sin(angle);
-    this.c = Math.sin(angle);
+    this.c = Math.cos(angle);
     return this;
   }
 }
@@ -149,18 +153,9 @@ export class Mat4 extends Float32Array {
     return this;
   }
 
-  rotate(rad: number, axis: [number, number, number]): Mat4 {
-    let [x, y, z] = axis;
-    let len = Math.sqrt(x * x + y * y + z * z);
-
-    len = 1 / len;
-    x *= len;
-    y *= len;
-    z *= len;
-
+  rotate(rad: number): Mat4 {
     const s = Math.sin(rad);
     const c = Math.cos(rad);
-    const t = 1 - c;
 
     const a00 = this[0];
     const a01 = this[1];
@@ -175,28 +170,23 @@ export class Mat4 extends Float32Array {
     const a22 = this[10];
     const a23 = this[11];
 
-    const b00 = x * x * t + c;
-    const b01 = y * x * t + z * s;
-    const b02 = z * x * t - y * s;
-    const b10 = x * y * t - z * s;
-    const b11 = y * y * t + c;
-    const b12 = z * y * t + x * s;
-    const b20 = x * z * t + y * s;
-    const b21 = y * z * t - x * s;
-    const b22 = z * z * t + c;
+    const b00 = c;
+    const b01 = s;
+    const b10 = -s;
+    const b11 = c;
 
-    this[0] = a00 * b00 + a10 * b01 + a20 * b02;
-    this[1] = a01 * b00 + a11 * b01 + a21 * b02;
-    this[2] = a02 * b00 + a12 * b01 + a22 * b02;
-    this[3] = a03 * b00 + a13 * b01 + a23 * b02;
-    this[4] = a00 * b10 + a10 * b11 + a20 * b12;
-    this[5] = a01 * b10 + a11 * b11 + a21 * b12;
-    this[6] = a02 * b10 + a12 * b11 + a22 * b12;
-    this[7] = a03 * b10 + a13 * b11 + a23 * b12;
-    this[8] = a00 * b20 + a10 * b21 + a20 * b22;
-    this[9] = a01 * b20 + a11 * b21 + a21 * b22;
-    this[10] = a02 * b20 + a12 * b21 + a22 * b22;
-    this[11] = a03 * b20 + a13 * b21 + a23 * b22;
+    this[0] = a00 * b00 + a10 * b01;
+    this[1] = a01 * b00 + a11 * b01;
+    this[2] = a02 * b00 + a12 * b01;
+    this[3] = a03 * b00 + a13 * b01;
+    this[4] = a00 * b10 + a10 * b11;
+    this[5] = a01 * b10 + a11 * b11;
+    this[6] = a02 * b10 + a12 * b11;
+    this[7] = a03 * b10 + a13 * b11;
+    this[8] = a20;
+    this[9] = a21;
+    this[10] = a22;
+    this[11] = a23;
     return this;
   }
 }
