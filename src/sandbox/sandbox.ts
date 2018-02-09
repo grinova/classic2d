@@ -82,7 +82,7 @@ class Sandbox {
     const time = now - this.past;
     this.past = now;
     if (!this.isPause || this.makeStep) {
-      changePosition(time);
+      changeForce();
       this.world.step(time);
       this.makeStep = false;
     }
@@ -147,11 +147,9 @@ function resetWorld(world: World): void {
   createBodies(world);
 }
 
-let localTime = 0;
-function changePosition(time: number): void {
-  localTime += time;
-  const x = -2 * Math.cos(0.1 * Math.PI * localTime / 1000);
-  movingBody.sweep.c.x = x;
+function changeForce(): void {
+  const position = movingBody.getPosition();
+  movingBody.force.x = -position.x;
 }
 
 window.onload = () => {
