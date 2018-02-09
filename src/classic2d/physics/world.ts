@@ -10,13 +10,14 @@ import { CircleShape } from 'classic2d/physics/shapes/circle-shape';
 import { ShapeType } from 'classic2d/physics/shapes/shape';
 
 const enum Flags {
-  newBodies = 1
+  newBodies = 1,
+  clearForces = 2
 }
 
 export class World {
   private bodies: Set<Body> = new Set<Body>();
   private contactManager: ContactManager = new ContactManager(this);
-  private flags: Flags = 0;
+  private flags: Flags = Flags.clearForces;
 
   private draw: void | Draw;
 
@@ -100,6 +101,11 @@ export class World {
       body.synchronize();
     });
     this.contactManager.findNewContacts();
+    if (this.flags & Flags.clearForces) {
+      for (const body of this.bodies) {
+        body.force.set(0, 0);
+      }
+    }
   }
 
   private drawShape(fixture: Fixture, matrix: Mat4, color: Color) {
