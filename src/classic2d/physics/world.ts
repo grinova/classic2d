@@ -92,9 +92,9 @@ export class World {
     const T = time / 1000;
     for (const body of this.bodies) {
       const m = body.getMassData().mass;
-      const a = Vec2.copy(body.force).mul(T);
-      const vs = Vec2.copy(body.linearVelocity).mul(T);
-      const as = Vec2.copy(a).mul(T * T / 2);
+      const a = body.force.copy().mul(T);
+      const vs = body.linearVelocity.copy().mul(T);
+      const as = a.copy().mul(T * T / 2);
       const pos = body.getPosition();
       pos.add(vs);
       pos.add(as);

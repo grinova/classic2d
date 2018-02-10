@@ -441,7 +441,7 @@ export class DebugDraw implements Draw {
       const p2 = new Vec2(x, y);
       ps.push(p1);
       ps.push(p2);
-      p1 = Vec2.copy(p2);
+      p1 = p2.copy();
     }
     this.drawSegment(matrix, new Vec2(), ps[0], color);
     this.lines.addVertices(matrix, ps, color);

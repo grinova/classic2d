@@ -16,10 +16,10 @@ export class Body {
   private xf: Transform;
 
   constructor(def: BodyDef) {
-    this.sweep.c = Vec2.copy(def.position);
+    this.sweep.c = def.position.copy();
     this.sweep.a = def.angle;
-    this.xf = new Transform(Vec2.copy(this.sweep.c), def.angle);
-    this.linearVelocity = Vec2.copy(def.linearVelocity);
+    this.xf = new Transform(this.sweep.c, def.angle);
+    this.linearVelocity = def.linearVelocity.copy();
     this.angularVelocity = def.angularVelocity;
   }
 
@@ -65,7 +65,7 @@ export class Body {
   }
 
   getPosition(): Vec2 {
-    return Vec2.copy(this.sweep.c);
+    return this.sweep.c.copy();
   }
 
   setTransform(position: Vec2, angle: number): void {
@@ -84,7 +84,7 @@ export class Body {
       this.massData.center.set(0, 0);
     }
     const massData = this.fixture.getMassData();
-    const center = Vec2.copy(massData.center);
+    const center = massData.center.copy();
     this.massData.mass += massData.mass;
     this.massData.center.add(center.mul(massData.mass));
     this.massData.center.mul(1.0 / this.massData.mass);

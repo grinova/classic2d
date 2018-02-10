@@ -3,7 +3,7 @@ export class Vec2 {
   y: number;
 
   static copy(v: Vec2): Vec2 {
-    return new Vec2(v.x, v.y);
+    return v.copy();
   }
 
   constructor(x: number = 0, y: number = 0) {
@@ -11,7 +11,7 @@ export class Vec2 {
   }
 
   copy(): Vec2 {
-    return Vec2.copy(this);
+    return new Vec2(this.x, this.y);
   }
 
   set(x: number, y: number) {
@@ -59,7 +59,7 @@ export class Transform {
   rot: Rot;
 
   constructor(pos: Vec2, angle: number) {
-    this.pos = Vec2.copy(pos);
+    this.pos = pos.copy();
     this.rot = new Rot().setAngle(angle);
   }
 
