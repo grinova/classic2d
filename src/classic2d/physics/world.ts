@@ -25,9 +25,9 @@ export class World {
   private draw: void | Draw;
 
   clearForces(): void {
-    this.bodies.forEach(body => {
+    for (const body of this.bodies) {
       body.force.set(0, 0);
-    });
+    }
   }
 
   createBody(def: BodyDef): Body {
@@ -53,12 +53,12 @@ export class World {
     if (!this.draw) {
       return;
     }
-    this.bodies.forEach(body => {
+    for (const body of this.bodies) {
       const matrix = body.getModelMatrix();
       const fixture = body.getFixture();
       const color = COLORS.WHITE;
       this.drawShape(fixture, matrix, color);
-    });
+    }
     const contacts = this.contactManager.getContacts();
     for (const contact of contacts) {
       const point = contact.getPoint();
@@ -89,7 +89,7 @@ export class World {
     }
 
     const T = time / 1000;
-    this.bodies.forEach(body => {
+    for (const body of this.bodies) {
       const m = body.getMassData().mass;
       const a = Vec2.copy(body.force).mul(T);
       const vs = Vec2.copy(body.linearVelocity).mul(T);
@@ -103,7 +103,7 @@ export class World {
       body.sweep.c.set(pos.x, pos.y);
       body.sweep.a = body.getAngle() + da;
       body.synchronize();
-    });
+    }
 
     this.contactManager.findNewContacts();
     this.contactManager.collide();
