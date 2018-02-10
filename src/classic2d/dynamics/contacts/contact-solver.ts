@@ -29,8 +29,8 @@ export class ContactSolver {
   }
 
   private solveDynamic(bodyA: Body, bodyB: Body): void {
-    const cA = bodyA.getPosition();
-    const cB = bodyB.getPosition();
+    const cA = bodyA.sweep.c.copy();
+    const cB = bodyB.sweep.c.copy();
     const vA = bodyA.linearVelocity.copy();
     const vB = bodyB.linearVelocity.copy();
     const massDataA = bodyA.getMassData();
@@ -62,8 +62,8 @@ export class ContactSolver {
   }
 
   private solveStatic(bodyA: Body, bodyB: Body): void {
-    const cA = bodyA.getPosition();
-    const cB = bodyB.getPosition();
+    const cA = bodyA.sweep.c.copy();
+    const cB = bodyB.sweep.c.copy();
     const vA = bodyA.linearVelocity.copy();
     const massDataA = bodyA.getMassData();
     const massDataB = bodyB.getMassData();

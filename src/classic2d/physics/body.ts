@@ -71,15 +71,11 @@ export class Body {
   }
 
   getPosition(): Vec2 {
-    return this.sweep.c.copy();
-  }
-
-  setTransform(position: Vec2, angle: number): void {
-    this.xf.set(position, angle);
+    return this.xf.pos.copy();
   }
 
   synchronize(): void {
-    this.setTransform(this.sweep.c, this.sweep.a);
+    this.xf.set(this.sweep.c, this.sweep.a);
   }
 
   private resetMassData(): void {

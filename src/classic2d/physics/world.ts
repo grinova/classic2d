@@ -112,13 +112,16 @@ export class World {
       body.linearVelocity.add(a);
       body.sweep.c.set(pos.x, pos.y);
       body.sweep.a = body.getAngle() + da;
-      body.synchronize();
     }
 
     this.contactManager.findNewContacts();
     this.contactManager.collide();
     const contactSolver = new ContactSolver(this);
     contactSolver.solve();
+
+    for (const body of this.bodies) {
+      body.synchronize();
+    }
 
     if (this.flags & Flags.clearForces) {
       for (const body of this.bodies) {
