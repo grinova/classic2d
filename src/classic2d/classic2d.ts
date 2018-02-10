@@ -1,4 +1,4 @@
-export { Color, COLORS } from 'classic2d/common/color';
+export { Color } from 'classic2d/common/color';
 export { Contact } from 'classic2d/dynamics/contacts/contact';
 export { ContactListener } from 'classic2d/dynamics/worlds-callbacks';
 export { Draw } from 'classic2d/graphics/common/draw';

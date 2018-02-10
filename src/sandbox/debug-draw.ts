@@ -1,27 +1,34 @@
 import {
   Color,
-  COLORS,
   Draw,
-  Vec2,
-  Mat4
+  Mat4,
+  Vec2
 } from 'classic2d/classic2d';
+import { COLOR_COMPONENTS } from 'classic2d/common/color';
 import { Exception } from 'sandbox/common/common';
+
+const WHITE = '#FFFFFF';
 
 const vsSource = `
 attribute vec4 aVertexPosition;
+attribute vec4 aColorPosition;
 
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 
+varying lowp vec4 vColor;
+
 void main(void) {
   gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+  vColor = aColorPosition;
 }
 `;
 
 const fsSource = `
+varying lowp vec4 vColor;
 
 void main(void) {
-  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+  gl_FragColor = vColor;
 }
 `;
 
@@ -99,18 +106,21 @@ class RenderLine {
   private camera: Camera;
 
   private vertices = new Float32Array(RenderLine.MAX_VERTICES);
+  private colors = new Float32Array(RenderLine.MAX_VERTICES * 2);
   private count = 0;
   private matrices = new Array<{ matrix: Mat4, offset: number, count: number }>(RenderLine.MAX_MATRICES);
   private indices = new Uint16Array(RenderLine.MAX_VERTICES / 2);
   private matricesCount = 0;
 
-  private positionBuffer: WebGLBuffer;
+  private vertexBuffer: WebGLBuffer;
+  private colorBuffer: WebGLBuffer;
   private indexBuffer: WebGLBuffer;
 
   private programInfo: {
     program: WebGLProgram,
     attribLocations: {
       vertexPosition: number;
+      colorPosition: number;
     },
     uniformLocations: {
       projectionMatrix: WebGLUniformLocation,
@@ -121,14 +131,16 @@ class RenderLine {
   constructor(gl: WebGLRenderingContext, camera: Camera) {
     this.gl = gl;
     this.camera = camera;
-    this.positionBuffer = gl.createBuffer();
+    this.vertexBuffer = gl.createBuffer();
+    this.colorBuffer = gl.createBuffer();
     this.indexBuffer = gl.createBuffer();
 
     const program = initShaderProgram(gl, vsSource, fsSource);
     this.programInfo = {
       program,
       attribLocations: {
-        vertexPosition: gl.getAttribLocation(program, 'aVertexPosition')
+        vertexPosition: gl.getAttribLocation(program, 'aVertexPosition'),
+        colorPosition: gl.getAttribLocation(program, 'aColorPosition')
       },
       uniformLocations: {
         projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix'),
@@ -153,6 +165,10 @@ class RenderLine {
       }
       this.vertices[this.count++] = ps[i].x;
       this.vertices[this.count++] = ps[i].y;
+      const offset = (this.count / 2 - 1) * COLOR_COMPONENTS;
+      for (let j = 0; j < COLOR_COMPONENTS; j++) {
+        this.colors[offset + j] = color[j];
+      }
     }
     this.matrices[this.matricesCount++] = { matrix, offset: lastVertices / 2, count: (this.count - lastVertices) / 2 };
   }
@@ -162,14 +178,20 @@ class RenderLine {
       return;
     }
 
-    const { gl, vertices, indices, positionBuffer, indexBuffer, programInfo } = this;
+    const { gl, vertices, colors, indices, vertexBuffer, colorBuffer, indexBuffer, programInfo } = this;
     const projectionMatrix = this.camera.buildProjectionMatrix();
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
     gl.vertexAttribPointer(
       programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(
+      programInfo.attribLocations.colorPosition, COLOR_COMPONENTS, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(programInfo.attribLocations.colorPosition);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
@@ -199,18 +221,21 @@ class RenderPoint {
   private camera: Camera;
 
   private vertices = new Float32Array(RenderPoint.MAX_VERTICES);
+  private colors = new Float32Array(RenderPoint.MAX_VERTICES * 2);
   private count = 0;
   private indices = new Uint16Array(RenderPoint.MAX_VERTICES / 2);
   private matrices = new Array<Mat4>(RenderPoint.MAX_VERTICES);
   private matricesCount = 0;
 
   private vertexBuffer: WebGLBuffer;
+  private colorBuffer: WebGLBuffer;
   private indexBuffer: WebGLBuffer;
 
   private programInfo: {
     program: WebGLProgram,
     attribLocations: {
       vertexPosition: number;
+      colorPosition: number;
     },
     uniformLocations: {
       projectionMatrix: WebGLUniformLocation
@@ -221,23 +246,38 @@ class RenderPoint {
     this.gl = gl;
     this.camera = camera;
     this.vertexBuffer = gl.createBuffer();
+    this.colorBuffer = gl.createBuffer();
     this.indexBuffer = gl.createBuffer();
 
     const vsSource = `
 attribute vec4 aVertexPosition;
+attribute vec4 aColorPosition;
 
 uniform mat4 uProjectionMatrix;
 
+varying lowp vec4 vColor;
+
 void main(void) {
   gl_Position = uProjectionMatrix * aVertexPosition;
-  gl_PointSize = 4.0;
+  gl_PointSize = 5.0;
+  vColor = aColorPosition;
 }
     `;
+
+    const fsSource = `
+varying lowp vec4 vColor;
+
+void main(void) {
+  gl_FragColor = vColor;
+}
+    `;
+
     const program = initShaderProgram(gl, vsSource, fsSource);
     this.programInfo = {
       program,
       attribLocations: {
-        vertexPosition: gl.getAttribLocation(program, 'aVertexPosition')
+        vertexPosition: gl.getAttribLocation(program, 'aVertexPosition'),
+        colorPosition: gl.getAttribLocation(program, 'aColorPosition')
       },
       uniformLocations: {
         projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix')
@@ -254,9 +294,13 @@ void main(void) {
     if (this.count === RenderPoint.MAX_VERTICES) {
       this.flush();
     }
-    const offset = this.count * 2;
-    this.vertices[offset] = vertex.x;
-    this.vertices[offset + 1] = vertex.y;
+    const vertexOffset = this.count * 2;
+    this.vertices[vertexOffset] = vertex.x;
+    this.vertices[vertexOffset + 1] = vertex.y;
+    const colorOffset = this.count * COLOR_COMPONENTS;
+    for (let i = 0; i < COLOR_COMPONENTS; i++) {
+      this.colors[colorOffset + i] = color[i];
+    }
     this.count++;
   }
 
@@ -265,7 +309,7 @@ void main(void) {
       return;
     }
 
-    const { gl, vertices, indices, vertexBuffer, indexBuffer, programInfo } = this;
+    const { gl, vertices, colors, indices, vertexBuffer, colorBuffer, indexBuffer, programInfo } = this;
     const projectionMatrix = this.camera.buildProjectionMatrix();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
@@ -273,6 +317,12 @@ void main(void) {
     gl.vertexAttribPointer(
       programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(
+      programInfo.attribLocations.colorPosition, COLOR_COMPONENTS, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(programInfo.attribLocations.colorPosition);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
@@ -320,7 +370,7 @@ class RenderText {
   flush(): void {
     const { gl2d } = this;
     gl2d.clearRect(0, 0, gl2d.canvas.width, gl2d.canvas.height);
-    gl2d.fillStyle = COLORS.WHITE;
+    gl2d.fillStyle = WHITE;
     gl2d.font = this.size + 'px ' + RenderText.DEFAULT_FONT;
     gl2d.textBaseline = 'top';
 

@@ -1,5 +1,3 @@
-export type Color = string;
+export type Color = number[];
 
-export const COLORS: { [name: string]: Color } = {
-  WHITE: '#FFFFFF'
-};
+export const COLOR_COMPONENTS = 4;

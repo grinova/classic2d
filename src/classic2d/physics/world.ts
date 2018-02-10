@@ -1,4 +1,5 @@
-import { Color, COLORS } from 'classic2d/common/color';
+import { Color } from 'classic2d/common/color';
+import { COLORS } from 'classic2d/common/settings';
 import { ContactManager } from 'classic2d/dynamics/contact-manager';
 import { ContactSolver } from 'classic2d/dynamics/contacts/contact-solver';
 import { ContactListener } from 'classic2d/dynamics/worlds-callbacks';
@@ -56,13 +57,13 @@ export class World {
     for (const body of this.bodies) {
       const matrix = body.getModelMatrix();
       const fixture = body.getFixture();
-      const color = COLORS.WHITE;
+      const color = COLORS.SHAPE;
       this.drawShape(fixture, matrix, color);
     }
     const contacts = this.contactManager.getContacts();
     for (const contact of contacts) {
       const point = contact.getPoint();
-      this.draw.drawPoint(point, COLORS.WHITE);
+      this.draw.drawPoint(point, COLORS.CONTACT);
     }
   }
 
