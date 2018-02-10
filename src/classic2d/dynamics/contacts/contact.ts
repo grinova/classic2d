@@ -3,15 +3,16 @@ import { ContactListener } from 'classic2d/dynamics/worlds-callbacks';
 import { Vec2 } from 'classic2d/math/common';
 import { Body } from 'classic2d/physics/body';
 
-const enum Flags {
-  touching = 1
+export const enum ContactFlags {
+  touching = 1,
+  wasTouching = 2
 }
 
 export class Contact {
   bodyA: Body;
   bodyB: Body;
 
-  private flags: Flags = 0;
+  flags: ContactFlags = 0;
 
   constructor(bodyA: Body, bodyB: Body) {
     this.bodyA = bodyA;
@@ -23,16 +24,19 @@ export class Contact {
     const radiusA = this.bodyA.getRadius();
     const centerB = this.bodyB.getPosition();
     const radiusB = this.bodyB.getRadius();
-    return centerA.add(centerB).mul(radiusB / (radiusA + radiusB));
+    return centerA.sub(centerB).mul(radiusB / (radiusA + radiusB)).add(centerB);
   }
 
   update(listener: void | ContactListener): void {
-    const wasTouching = (this.flags & Flags.touching) === Flags.touching;
+    const wasTouching = this.flags & ContactFlags.touching;
+    if (wasTouching) {
+      this.flags |= ContactFlags.wasTouching;
+    }
     const touching = testOverlap(this.bodyA, this.bodyB);
     if (touching) {
-      this.flags |= Flags.touching;
+      this.flags |= ContactFlags.touching;
     } else {
-      this.flags &= ~Flags.touching;
+      this.flags &= ~ContactFlags.touching;
     }
     if (!listener) {
       return;

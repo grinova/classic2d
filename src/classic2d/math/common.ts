@@ -10,9 +10,19 @@ export class Vec2 {
     this.set(x, y);
   }
 
+  copy(): Vec2 {
+    return Vec2.copy(this);
+  }
+
   set(x: number, y: number) {
     this.x = x;
     this.y = y;
+  }
+
+  set2(vec: Vec2): Vec2 {
+    this.x = vec.x;
+    this.y = vec.y;
+    return this;
   }
 
   add(v: Vec2): Vec2 {
@@ -50,31 +60,46 @@ export class Transform {
 
   constructor(pos: Vec2, angle: number) {
     this.pos = Vec2.copy(pos);
-    this.rot = new Rot(angle);
+    this.rot = new Rot().setAngle(angle);
   }
 
   set(pos: Vec2, angle: number): Transform {
     this.pos.set(pos.x, pos.y);
-    this.rot.set(angle);
+    this.rot.setAngle(angle);
     return this;
   }
 }
 
 export class Rot {
-  s: number;
-  c: number;
-
-  constructor(angle: number) {
-    this.set(angle);
-  }
+  c: number = 1;
+  s: number = 0;
 
   getAngle(): number {
     return Math.atan2(this.s, this.c);
   }
 
-  set(angle: number): Rot {
-    this.s = Math.sin(angle);
+  inverse(): Rot {
+    this.s = -this.s;
+    return this;
+  }
+
+  normalize(): Rot {
+    const { c, s } = this;
+    const rl = 1 / Math.sqrt(c * c + s * s);
+    this.c *= rl;
+    this.s *= rl;
+    return this;
+  }
+
+  setAngle(angle: number): Rot {
     this.c = Math.cos(angle);
+    this.s = Math.sin(angle);
+    return this;
+  }
+
+  setXY(x: number, y: number): Rot {
+    this.c = x;
+    this.s = y;
     return this;
   }
 }

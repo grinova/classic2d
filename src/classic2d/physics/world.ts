@@ -1,5 +1,6 @@
 import { Color, COLORS } from 'classic2d/common/color';
 import { ContactManager } from 'classic2d/dynamics/contact-manager';
+import { ContactSolver } from 'classic2d/dynamics/contacts/contact-solver';
 import { ContactListener } from 'classic2d/dynamics/worlds-callbacks';
 import { Draw } from 'classic2d/graphics/common/draw';
 import { Mat4, Transform, Vec2 } from 'classic2d/math/common';
@@ -15,9 +16,11 @@ const enum Flags {
 }
 
 export class World {
+  private static readonly DEFAULT_FLAGS = Flags.clearForces;
+
   private bodies: Set<Body> = new Set<Body>();
   private contactManager: ContactManager = new ContactManager(this);
-  private flags: Flags = Flags.clearForces;
+  private flags: Flags = World.DEFAULT_FLAGS;
 
   private draw: void | Draw;
 
@@ -39,6 +42,7 @@ export class World {
       this.destroyBody(body);
     }
     this.contactManager.clear();
+    this.flags = World.DEFAULT_FLAGS;
   }
 
   destroyBody(body: Body): void {
@@ -83,7 +87,7 @@ export class World {
       this.contactManager.findNewContacts();
       this.flags &= ~Flags.newBodies;
     }
-    this.contactManager.collide();
+
     const T = time / 1000;
     this.bodies.forEach(body => {
       const m = body.getMassData().mass;
@@ -100,7 +104,12 @@ export class World {
       body.sweep.a = body.getAngle() + da;
       body.synchronize();
     });
+
     this.contactManager.findNewContacts();
+    this.contactManager.collide();
+    const contactSolver = new ContactSolver(this);
+    contactSolver.solve();
+
     if (this.flags & Flags.clearForces) {
       for (const body of this.bodies) {
         body.force.set(0, 0);
