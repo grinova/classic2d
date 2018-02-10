@@ -1,6 +1,7 @@
 import {
   Body,
   BodyDef,
+  BodyType,
   CircleShape,
   Draw,
   FixtureDef,
@@ -118,7 +119,6 @@ function createBodies(world: World): void {
       angularVelocity: Math.PI / 4
     };
     const body = world.createBody(bd);
-    body.force.set(0, 0);
 
     body.setFixture(fd);
     movingBody = body;
@@ -136,6 +136,7 @@ function createBodies(world: World): void {
       angularVelocity: -Math.PI / 2
     };
     const body = world.createBody(bd);
+    body.type = BodyType.static;
 
     body.setFixture(fd);
   }

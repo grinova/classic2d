@@ -5,7 +5,13 @@ import { FixtureDef } from 'classic2d/physics/fixture-def';
 import { MassData } from 'classic2d/physics/mass-data';
 import { CircleShape } from 'classic2d/physics/shapes/circle-shape';
 
+export const enum BodyType {
+  static,
+  dynamic
+}
+
 export class Body {
+  type: BodyType = BodyType.dynamic;
   linearVelocity: Vec2;
   angularVelocity: number;
   force: Vec2 = new Vec2();

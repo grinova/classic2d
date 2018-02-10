@@ -1,10 +1,10 @@
 import {
   Color,
+  COLOR_COMPONENTS,
   Draw,
   Mat4,
   Vec2
 } from 'classic2d/classic2d';
-import { COLOR_COMPONENTS } from 'classic2d/common/color';
 import { Exception } from 'sandbox/common/common';
 
 const WHITE = '#FFFFFF';

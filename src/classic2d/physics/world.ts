@@ -5,7 +5,7 @@ import { ContactSolver } from 'classic2d/dynamics/contacts/contact-solver';
 import { ContactListener } from 'classic2d/dynamics/worlds-callbacks';
 import { Draw } from 'classic2d/graphics/common/draw';
 import { Mat4, Transform, Vec2 } from 'classic2d/math/common';
-import { Body } from 'classic2d/physics/body';
+import { Body, BodyType } from 'classic2d/physics/body';
 import { BodyDef } from 'classic2d/physics/body-def';
 import { Fixture } from 'classic2d/physics/fixture';
 import { CircleShape } from 'classic2d/physics/shapes/circle-shape';
@@ -57,8 +57,14 @@ export class World {
     for (const body of this.bodies) {
       const matrix = body.getModelMatrix();
       const fixture = body.getFixture();
-      const color = COLORS.SHAPE;
-      this.drawShape(fixture, matrix, color);
+      switch (body.type) {
+        case BodyType.dynamic:
+          this.drawShape(fixture, matrix, COLORS.DYNAMIC);
+          break;
+        case BodyType.static:
+          this.drawShape(fixture, matrix, COLORS.STATIC);
+          break;
+      }
     }
     const contacts = this.contactManager.getContacts();
     for (const contact of contacts) {
@@ -91,6 +97,9 @@ export class World {
 
     const T = time / 1000;
     for (const body of this.bodies) {
+      if (body.type === BodyType.static) {
+        continue;
+      }
       const m = body.getMassData().mass;
       const a = body.force.copy().mul(T);
       const vs = body.linearVelocity.copy().mul(T);
