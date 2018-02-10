@@ -136,7 +136,7 @@ function createBodies(world: World): void {
       angularVelocity: -Math.PI / 2
     };
     const body = world.createBody(bd);
-    body.type = BodyType.static;
+    // body.type = BodyType.static;
 
     body.setFixture(fd);
   }

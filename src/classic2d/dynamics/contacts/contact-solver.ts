@@ -40,7 +40,9 @@ export class ContactSolver {
 
     const mcA = massDataA.center.copy().add(cA);
     const mcB = massDataB.center.copy().add(cB);
-    const massRot = new Rot().setXY(mcB.x - mcA.x, mcA.y - mcB.y).normalize();
+    const x = mcB.x - mcA.x;
+    const y = mcB.y - mcA.y;
+    const massRot = new Rot().setXY(x, -y).normalize();
 
     vA.rotate(massRot);
     vB.rotate(massRot);
@@ -70,7 +72,9 @@ export class ContactSolver {
 
     const mcA = massDataA.center.copy().add(cA);
     const mcB = massDataB.center.copy().add(cB);
-    const massRot = new Rot().setXY(mcB.x - mcA.x, mcA.y - mcB.y).normalize();
+    const x = mcB.x - mcA.x;
+    const y = mcB.y - mcA.y;
+    const massRot = new Rot().setXY(x, -y).normalize();
 
     vA.rotate(massRot);
 

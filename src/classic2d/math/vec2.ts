@@ -50,8 +50,9 @@ export class Vec2 {
   }
 
   rotate(rot: Rot): Vec2 {
-    this.x = this.x * rot.c - this.y * rot.s;
-    this.y = this.x * rot.s + this.y * rot.c;
+    const { x, y } = this;
+    this.x = x * rot.c - y * rot.s;
+    this.y = x * rot.s + y * rot.c;
     return this;
   }
 }
