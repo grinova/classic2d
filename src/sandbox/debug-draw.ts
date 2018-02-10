@@ -9,29 +9,6 @@ import { Exception } from 'sandbox/common/common';
 
 const WHITE = '#FFFFFF';
 
-const vsSource = `
-attribute vec4 aVertexPosition;
-attribute vec4 aColorPosition;
-
-uniform mat4 uModelViewMatrix;
-uniform mat4 uProjectionMatrix;
-
-varying lowp vec4 vColor;
-
-void main(void) {
-  gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-  vColor = aColorPosition;
-}
-`;
-
-const fsSource = `
-varying lowp vec4 vColor;
-
-void main(void) {
-  gl_FragColor = vColor;
-}
-`;
-
 function initShaderProgram(gl: WebGLRenderingContext, vsSource: string, fsSource: string): WebGLProgram {
   const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
   const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
@@ -99,17 +76,42 @@ export class Camera {
 }
 
 class RenderLine {
-  private static readonly MAX_VERTICES = 1024;
   private static readonly MAX_MATRICES = 512;
+  private static readonly MAX_VERTICES = RenderLine.MAX_MATRICES * 2;
+  private static readonly MAX_COLORS = RenderLine.MAX_MATRICES * 4;
+  private static readonly MAX_INDICES = RenderLine.MAX_MATRICES;
+
+  private static readonly VS_SOURCE = `
+    attribute vec4 aVertex;
+    attribute vec4 aColor;
+
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+
+    varying lowp vec4 vColor;
+
+    void main(void) {
+      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertex;
+      vColor = aColor;
+    }
+    `;
+
+  private static readonly FS_SOURCE = `
+    varying lowp vec4 vColor;
+
+    void main(void) {
+      gl_FragColor = vColor;
+    }
+    `;
 
   private gl: WebGLRenderingContext;
   private camera: Camera;
 
   private vertices = new Float32Array(RenderLine.MAX_VERTICES);
-  private colors = new Float32Array(RenderLine.MAX_VERTICES * 2);
+  private colors = new Float32Array(RenderLine.MAX_COLORS);
   private count = 0;
   private matrices = new Array<{ matrix: Mat4, offset: number, count: number }>(RenderLine.MAX_MATRICES);
-  private indices = new Uint16Array(RenderLine.MAX_VERTICES / 2);
+  private indices = new Uint16Array(RenderLine.MAX_INDICES);
   private matricesCount = 0;
 
   private vertexBuffer: WebGLBuffer;
@@ -135,12 +137,12 @@ class RenderLine {
     this.colorBuffer = gl.createBuffer();
     this.indexBuffer = gl.createBuffer();
 
-    const program = initShaderProgram(gl, vsSource, fsSource);
+    const program = initShaderProgram(gl, RenderLine.VS_SOURCE, RenderLine.FS_SOURCE);
     this.programInfo = {
       program,
       attribLocations: {
-        vertexPosition: gl.getAttribLocation(program, 'aVertexPosition'),
-        colorPosition: gl.getAttribLocation(program, 'aColorPosition')
+        vertexPosition: gl.getAttribLocation(program, 'aVertex'),
+        colorPosition: gl.getAttribLocation(program, 'aColor')
       },
       uniformLocations: {
         projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix'),
@@ -148,7 +150,7 @@ class RenderLine {
       }
     };
 
-    for (let i = 0; i < RenderLine.MAX_VERTICES / 2; i++) {
+    for (let i = 0; i < RenderLine.MAX_INDICES; i++) {
       this.indices[i] = i;
     }
   }
@@ -216,14 +218,37 @@ class RenderLine {
 
 class RenderPoint {
   private static readonly MAX_VERTICES = 1024;
+  private static readonly MAX_COLORS = RenderPoint.MAX_VERTICES * 2;
+  private static readonly MAX_INDICES = RenderPoint.MAX_VERTICES / 2;
+
+  private static readonly VS_SOURCE = `
+    attribute vec4 aVertex;
+    attribute vec4 aColor;
+
+    uniform mat4 uProjectionMatrix;
+
+    varying lowp vec4 vColor;
+
+    void main(void) {
+      gl_Position = uProjectionMatrix * aVertex;
+      gl_PointSize = 5.0;
+      vColor = aColor;
+    }`;
+
+  private static readonly FS_SOURCE = `
+    varying lowp vec4 vColor;
+
+    void main(void) {
+      gl_FragColor = vColor;
+    }`;
 
   private gl: WebGLRenderingContext;
   private camera: Camera;
 
   private vertices = new Float32Array(RenderPoint.MAX_VERTICES);
-  private colors = new Float32Array(RenderPoint.MAX_VERTICES * 2);
+  private colors = new Float32Array(RenderPoint.MAX_COLORS);
   private count = 0;
-  private indices = new Uint16Array(RenderPoint.MAX_VERTICES / 2);
+  private indices = new Uint16Array(RenderPoint.MAX_INDICES);
   private matrices = new Array<Mat4>(RenderPoint.MAX_VERTICES);
   private matricesCount = 0;
 
@@ -249,42 +274,19 @@ class RenderPoint {
     this.colorBuffer = gl.createBuffer();
     this.indexBuffer = gl.createBuffer();
 
-    const vsSource = `
-attribute vec4 aVertexPosition;
-attribute vec4 aColorPosition;
-
-uniform mat4 uProjectionMatrix;
-
-varying lowp vec4 vColor;
-
-void main(void) {
-  gl_Position = uProjectionMatrix * aVertexPosition;
-  gl_PointSize = 5.0;
-  vColor = aColorPosition;
-}
-    `;
-
-    const fsSource = `
-varying lowp vec4 vColor;
-
-void main(void) {
-  gl_FragColor = vColor;
-}
-    `;
-
-    const program = initShaderProgram(gl, vsSource, fsSource);
+    const program = initShaderProgram(gl, RenderPoint.VS_SOURCE, RenderPoint.FS_SOURCE);
     this.programInfo = {
       program,
       attribLocations: {
-        vertexPosition: gl.getAttribLocation(program, 'aVertexPosition'),
-        colorPosition: gl.getAttribLocation(program, 'aColorPosition')
+        vertexPosition: gl.getAttribLocation(program, 'aVertex'),
+        colorPosition: gl.getAttribLocation(program, 'aColor')
       },
       uniformLocations: {
         projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix')
       }
     };
 
-    for (let i = 0; i < RenderPoint.MAX_VERTICES / 2; i++) {
+    for (let i = 0; i < RenderPoint.MAX_INDICES; i++) {
       this.indices[i] = i;
     }
   }
