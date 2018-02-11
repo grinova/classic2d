@@ -1,7 +1,7 @@
 import { testOverlap } from 'classic2d/collision/collision';
 import { vector } from 'classic2d/common/functional';
 import { Contact } from 'classic2d/dynamics/contacts/contact';
-import { ContactListener } from 'classic2d/dynamics/worlds-callbacks';
+import { ContactListener } from 'classic2d/dynamics/world-callbacks';
 import { Vec2 } from 'classic2d/math/common';
 import { Body } from 'classic2d/physics/body';
 import { World } from 'classic2d/physics/world';

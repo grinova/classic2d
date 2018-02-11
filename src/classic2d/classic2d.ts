@@ -1,6 +1,6 @@
 export { Color, COLOR_COMPONENTS } from 'classic2d/common/color';
 export { Contact } from 'classic2d/dynamics/contacts/contact';
-export { ContactListener } from 'classic2d/dynamics/worlds-callbacks';
+export { ContactListener } from 'classic2d/dynamics/world-callbacks';
 export { Draw } from 'classic2d/graphics/common/draw';
 export * from 'classic2d/math/common';
 export { Body, BodyType } from 'classic2d/physics/body';
