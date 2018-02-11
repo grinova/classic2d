@@ -20,11 +20,18 @@ export class Contact {
   }
 
   getPoint(): Vec2 {
-    const centerA = this.bodyA.getPosition();
-    const radiusA = this.bodyA.getRadius();
-    const centerB = this.bodyB.getPosition();
-    const radiusB = this.bodyB.getRadius();
-    return centerA.sub(centerB).mul(radiusB / (radiusA + radiusB)).add(centerB);
+    const { bodyA, bodyB } = this;
+    const centerA = bodyA.getPosition();
+    const radiusA = bodyA.getRadius();
+    const centerB = bodyB.getPosition();
+    const radiusB = bodyB.getRadius();
+    if (!bodyA.inverse && !bodyB.inverse) {
+      return centerA.sub(centerB).mul(radiusB / (radiusA + radiusB)).add(centerB);
+    } else if (!bodyA.inverse && bodyB.inverse) {
+      return centerA.sub(centerB).mul(radiusB / (-radiusA + radiusB)).add(centerB);
+    } else if (bodyA.inverse && !bodyB.inverse) {
+      return centerB.sub(centerA).mul(radiusA / (radiusA - radiusB)).add(centerA);
+    }
   }
 
   update(listener: void | ContactListener): void {

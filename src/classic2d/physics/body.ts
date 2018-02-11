@@ -12,6 +12,7 @@ export const enum BodyType {
 
 export class Body {
   type: BodyType = BodyType.dynamic;
+  inverse: boolean = false;
   linearVelocity: Vec2;
   angularVelocity: number;
   force: Vec2 = new Vec2();
