@@ -6,6 +6,7 @@ import {
   Draw,
   FixtureDef,
   Vec2,
+  Rot,
   World
 } from 'classic2d/classic2d';
 import { setCanvasSize } from 'sandbox/common/dom';
@@ -103,43 +104,54 @@ class Sandbox {
   }
 }
 
-let movingBody: Body;
+function createBody(
+  world: World,
+  radius: number,
+  density: number,
+  position: Vec2,
+  angle: number,
+  linearVelocity: Vec2,
+  angularVelocity: number,
+  isStatic: boolean = false,
+  inverse: boolean = false
+): Body {
+  const shape = new CircleShape();
+  shape.radius = radius;
+  const fd = { shape: shape, density };
+
+  const bd: BodyDef = { position, angle, linearVelocity, angularVelocity };
+  const body = world.createBody(bd);
+  if (isStatic) {
+    body.type = BodyType.static;
+  }
+  body.inverse = inverse;
+
+  body.setFixture(fd);
+  return body;
+}
+
+function rand(max: number, min: number = 0): number {
+  return Math.random() * (max - min) + min;
+}
+
+function createArena(world: World, radius: number): Body {
+  return createBody(world, radius, 1000, new Vec2(), 0, new Vec2(), 0, true, true);
+}
+
+function createActors(world: World, count: number, arenaRadius: number): void {
+  const ACTOR_RADIUS = 0.05;
+  for (let i = 0; i < 20; i++) {
+    const position = new Vec2(rand(arenaRadius - 2 * ACTOR_RADIUS), 0)
+      .rotate(new Rot().setAngle(rand(2 * Math.PI)));
+    const linearVelocity = new Vec2(rand(1, 0)).rotate(new Rot().setAngle(rand(2 * Math.PI)));
+    createBody(world, ACTOR_RADIUS, 1, position, 0, linearVelocity, 0);
+  }
+}
 
 function createBodies(world: World): void {
-  {
-    const shape = new CircleShape();
-    shape.radius = 0.5;
-
-    const fd: FixtureDef = { shape, density: 1.0 };
-
-    const bd: BodyDef = {
-      position: new Vec2(-2, 1),
-      angle: Math.PI / 4,
-      linearVelocity: new Vec2(1, 0),
-      angularVelocity: Math.PI / 4
-    };
-    const body = world.createBody(bd);
-
-    body.setFixture(fd);
-    movingBody = body;
-  }
-
-  {
-    const shape = new CircleShape();
-    shape.radius = 1;
-    const fd = { shape: shape, density: 1.0 };
-
-    const bd: BodyDef = {
-      position: new Vec2(),
-      angle: 0,
-      linearVelocity: new Vec2(),
-      angularVelocity: -Math.PI / 2
-    };
-    const body = world.createBody(bd);
-    // body.type = BodyType.static;
-
-    body.setFixture(fd);
-  }
+  const ARENA_RADIUS = 3;
+  const arena = createArena(world, ARENA_RADIUS);
+  createActors(world, 20, ARENA_RADIUS);
 }
 
 function resetWorld(world: World): void {

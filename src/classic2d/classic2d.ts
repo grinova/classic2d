@@ -1,9 +1,8 @@
-export { COLOR_COMPONENTS } from 'classic2d/common/color';
-export { Color } from 'classic2d/common/color';
+export { Color, COLOR_COMPONENTS } from 'classic2d/common/color';
 export { Contact } from 'classic2d/dynamics/contacts/contact';
 export { ContactListener } from 'classic2d/dynamics/worlds-callbacks';
 export { Draw } from 'classic2d/graphics/common/draw';
-export { Mat4, Vec2 } from 'classic2d/math/common';
+export * from 'classic2d/math/common';
 export { Body, BodyType } from 'classic2d/physics/body';
 export { BodyDef } from 'classic2d/physics/body-def';
 export { FixtureDef } from 'classic2d/physics/fixture-def';
