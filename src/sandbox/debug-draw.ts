@@ -153,6 +153,9 @@ class RenderLine {
     for (let i = 0; i < RenderLine.MAX_INDICES; i++) {
       this.indices[i] = i;
     }
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
   }
 
   addVertices(matrix: Mat4, ps: Vec2[], color: Color): void {
@@ -161,9 +164,9 @@ class RenderLine {
       if (this.count === RenderLine.MAX_VERTICES) {
         if (i > 0) {
           this.matrices[this.matricesCount++] = { matrix, offset: lastVertices / 2, count: (this.count - lastVertices) / 2 };
-          lastVertices = this.count;
         }
         this.flush();
+        lastVertices = this.count;
       }
       this.vertices[this.count++] = ps[i].x;
       this.vertices[this.count++] = ps[i].y;
@@ -180,26 +183,24 @@ class RenderLine {
       return;
     }
 
-    const { gl, vertices, colors, indices, vertexBuffer, colorBuffer, indexBuffer, programInfo } = this;
+    const { gl, programInfo } = this;
     const projectionMatrix = this.camera.buildProjectionMatrix();
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    gl.useProgram(programInfo.program);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
     gl.vertexAttribPointer(
       programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
     gl.vertexAttribPointer(
       programInfo.attribLocations.colorPosition, COLOR_COMPONENTS, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(programInfo.attribLocations.colorPosition);
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.useProgram(programInfo.program);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
     for (let i = 0; i < this.matricesCount; i++) {
@@ -217,7 +218,7 @@ class RenderLine {
 }
 
 class RenderPoint {
-  private static readonly MAX_VERTICES = 1024;
+  private static readonly MAX_VERTICES = 512;
   private static readonly MAX_COLORS = RenderPoint.MAX_VERTICES * 2;
   private static readonly MAX_INDICES = RenderPoint.MAX_VERTICES / 2;
 
@@ -250,7 +251,6 @@ class RenderPoint {
   private count = 0;
   private indices = new Uint16Array(RenderPoint.MAX_INDICES);
   private matrices = new Array<Mat4>(RenderPoint.MAX_VERTICES);
-  private matricesCount = 0;
 
   private vertexBuffer: WebGLBuffer;
   private colorBuffer: WebGLBuffer;
@@ -289,21 +289,20 @@ class RenderPoint {
     for (let i = 0; i < RenderPoint.MAX_INDICES; i++) {
       this.indices[i] = i;
     }
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
   }
 
   vertex(vertex: Vec2, color: Color): void {
-    const lastVertices = this.count;
     if (this.count === RenderPoint.MAX_VERTICES) {
       this.flush();
     }
-    const vertexOffset = this.count * 2;
-    this.vertices[vertexOffset] = vertex.x;
-    this.vertices[vertexOffset + 1] = vertex.y;
-    const colorOffset = this.count * COLOR_COMPONENTS;
+    this.vertices[this.count++] = vertex.x;
+    this.vertices[this.count++] = vertex.y;
+    const colorOffset = ((this.count / 2) - 1) * COLOR_COMPONENTS;
     for (let i = 0; i < COLOR_COMPONENTS; i++) {
       this.colors[colorOffset + i] = color[i];
     }
-    this.count++;
   }
 
   flush(): void {
@@ -311,29 +310,25 @@ class RenderPoint {
       return;
     }
 
-    const { gl, vertices, colors, indices, vertexBuffer, colorBuffer, indexBuffer, programInfo } = this;
+    const { gl, programInfo } = this;
+    gl.useProgram(programInfo.program);
     const projectionMatrix = this.camera.buildProjectionMatrix();
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
     gl.vertexAttribPointer(
       programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
     gl.vertexAttribPointer(
       programInfo.attribLocations.colorPosition, COLOR_COMPONENTS, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(programInfo.attribLocations.colorPosition);
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    gl.useProgram(programInfo.program);
     gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
-    gl.drawElements(gl.POINTS, this.count, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.POINTS, this.count / 2, gl.UNSIGNED_SHORT, 0);
 
     gl.useProgram(null);
 
@@ -396,8 +391,6 @@ export interface Options {
 export class DebugDraw implements Draw {
   private static readonly CIRCLE_SEGMENT = 32;
 
-  private gl: WebGLRenderingContext;
-  private gl2d: CanvasRenderingContext2D;
   private camera: Camera;
   private lines: RenderLine;
   private text: RenderText;
@@ -409,13 +402,11 @@ export class DebugDraw implements Draw {
     camera: Camera,
     options?: void | Options
   ) {
-    this.gl = gl;
-    this.gl2d = gl2d;
     this.camera = camera;
-    this.lines = new RenderLine(this.gl, this.camera);
-    this.points = new RenderPoint(this.gl, this.camera);
+    this.lines = new RenderLine(gl, this.camera);
+    this.points = new RenderPoint(gl, this.camera);
     const textSize = options && options.textSize;
-    this.text = new RenderText(this.gl2d, textSize);
+    this.text = new RenderText(gl2d, textSize);
   }
 
   drawPolygon(matrix: Mat4, vertices: Vec2[], color: Color): void {
@@ -464,15 +455,6 @@ export class DebugDraw implements Draw {
   }
 
   flush(): void {
-    const { gl } = this;
-
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clearDepth(1.0);
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthFunc(gl.LEQUAL);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
     this.lines.flush();
     this.text.flush();
     this.points.flush();

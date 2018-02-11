@@ -17,6 +17,7 @@ import { MovingAverage } from 'sandbox/moving-average';
 class Sandbox {
   private canvasWebgl: HTMLCanvasElement;
   private canvas2d: HTMLCanvasElement;
+  private gl: WebGLRenderingContext;
   private camera: Camera;
   private world: World;
   private debugDraw: DebugDraw;
@@ -40,10 +41,10 @@ class Sandbox {
     this.world.setContactListener(new ContactListener());
     resetWorld(this.world);
 
-    const gl = this.canvasWebgl.getContext('webgl') || this.canvasWebgl.getContext('experimental-webgl');
+    this.gl = this.canvasWebgl.getContext('webgl') || this.canvasWebgl.getContext('experimental-webgl');
     const gl2d = this.canvas2d.getContext('2d');
 
-    this.debugDraw = new DebugDraw(gl, gl2d, this.camera);
+    this.debugDraw = new DebugDraw(this.gl, gl2d, this.camera);
     this.world.setDebugDraw(this.debugDraw);
 
     window.onresize = this.handleResize;
@@ -52,6 +53,18 @@ class Sandbox {
 
   run(): void {
     requestAnimationFrame(this.render);
+  }
+
+  private draw(): void {
+    const { gl } = this;
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearDepth(1.0);
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    this.world.drawDebugData();
   }
 
   private handleResize = (): void => {
@@ -87,7 +100,7 @@ class Sandbox {
       this.world.step(time);
       this.makeStep = false;
     }
-    this.world.drawDebugData();
+    this.draw();
     const averageFrameTime = this.frameTimeMovingAverage.get(time);
     const help = '[R] - reset; [P] - pause; [O] - step';
     const fps = 'FPS: ' + Math.floor(1000 / averageFrameTime).toString();
