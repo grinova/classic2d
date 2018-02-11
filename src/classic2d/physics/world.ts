@@ -90,37 +90,43 @@ export class World {
   }
 
   step(time: number): void {
+    if (time > 100) {
+      return;
+    }
     if (this.flags & Flags.newBodies) {
       this.contactManager.findNewContacts();
       this.flags &= ~Flags.newBodies;
     }
 
-    const T = time / 1000;
-    for (const body of this.bodies) {
-      if (body.type === BodyType.static) {
-        continue;
+    const iterations = Math.floor(time / Math.min(time, 4));
+    const T = time / (iterations * 1000);
+    for (let i = 0; i < iterations; i++) {
+      for (const body of this.bodies) {
+        if (body.type === BodyType.static) {
+          continue;
+        }
+        const m = body.getMassData().mass;
+        const a = body.force.copy().mul(T);
+        const vs = body.linearVelocity.copy().mul(T);
+        const as = a.copy().mul(T * T / 2);
+        const pos = body.getPosition();
+        pos.add(vs);
+        pos.add(as);
+        const da = body.angularVelocity * T;
+
+        body.linearVelocity.add(a);
+        body.sweep.c.set(pos.x, pos.y);
+        body.sweep.a = body.getAngle() + da;
       }
-      const m = body.getMassData().mass;
-      const a = body.force.copy().mul(T);
-      const vs = body.linearVelocity.copy().mul(T);
-      const as = a.copy().mul(T * T / 2);
-      const pos = body.getPosition();
-      pos.add(vs);
-      pos.add(as);
-      const da = body.angularVelocity * T;
 
-      body.linearVelocity.add(a);
-      body.sweep.c.set(pos.x, pos.y);
-      body.sweep.a = body.getAngle() + da;
-    }
+      this.contactManager.findNewContacts();
+      this.contactManager.collide();
+      const contactSolver = new ContactSolver(this);
+      contactSolver.solve();
 
-    this.contactManager.findNewContacts();
-    this.contactManager.collide();
-    const contactSolver = new ContactSolver(this);
-    contactSolver.solve();
-
-    for (const body of this.bodies) {
-      body.synchronize();
+      for (const body of this.bodies) {
+        body.synchronize();
+      }
     }
 
     if (this.flags & Flags.clearForces) {
