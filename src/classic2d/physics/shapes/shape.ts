@@ -8,5 +8,6 @@ export enum ShapeType {
 export interface Shape {
   clone(): Shape;
   computeMass(density: number): MassData;
+  getRadius(): number;
   getType(): ShapeType;
 }

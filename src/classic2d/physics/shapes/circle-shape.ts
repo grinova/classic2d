@@ -17,6 +17,10 @@ export class CircleShape implements Shape {
     return { mass, center };
   }
 
+  getRadius(): number {
+    return this.radius;
+  }
+
   getType(): ShapeType {
     return ShapeType.Circle;
   }

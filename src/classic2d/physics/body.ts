@@ -12,7 +12,6 @@ export const enum BodyType {
 
 export class Body {
   type: BodyType = BodyType.dynamic;
-  inverse: boolean = false;
   linearVelocity: Vec2;
   angularVelocity: number;
   force: Vec2 = new Vec2();
@@ -21,6 +20,8 @@ export class Body {
   private massData: MassData;
   private fixture: Fixture;
   private xf: Transform;
+  private radius: number = 0;
+  private inverse: boolean;
 
   constructor(def: BodyDef) {
     this.sweep.c = def.position.copy();
@@ -28,11 +29,15 @@ export class Body {
     this.xf = new Transform(this.sweep.c, def.angle);
     this.linearVelocity = def.linearVelocity.copy();
     this.angularVelocity = def.angularVelocity;
+    this.inverse = def.inverse;
+  }
+
+  getInverse(): boolean {
+    return this.inverse;
   }
 
   getRadius(): number {
-    const shape = this.fixture.getShape() as CircleShape;
-    return shape.radius;
+    return this.radius;
   }
 
   setFixture(def: FixtureDef): Fixture {
@@ -40,6 +45,7 @@ export class Body {
     if (this.fixture.getDensity() > 0) {
       this.resetMassData();
     }
+    this.resetRadius();
     return this.fixture;
   }
 
@@ -91,5 +97,11 @@ export class Body {
     this.massData.mass += massData.mass;
     this.massData.center.add(center.mul(massData.mass));
     this.massData.center.mul(1.0 / this.massData.mass);
+  }
+
+  private resetRadius(): void {
+    const shape = this.fixture.getShape();
+    const radius = shape.getRadius();
+    this.radius = this.inverse ? -radius : radius;
   }
 }

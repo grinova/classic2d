@@ -1,5 +1,4 @@
 import { testOverlap } from 'classic2d/collision/collision';
-import { vector } from 'classic2d/common/functional';
 import { Contact } from 'classic2d/dynamics/contacts/contact';
 import { ContactListener } from 'classic2d/dynamics/world-callbacks';
 import { Vec2 } from 'classic2d/math/common';
@@ -45,7 +44,7 @@ export class ContactManager {
   }
 
   findNewContacts(): void {
-    const bodies = vector(this.world.getBodies().values());
+    const bodies = this.world.getBodies();
     for (let i = 0; i < bodies.length; i++) {
       const bodyA = bodies[i];
       for (let j = i + 1; j < bodies.length; j++) {
@@ -69,6 +68,9 @@ export class ContactManager {
   }
 
   private hasContact(bodyA: Body, bodyB: Body): boolean {
+    if (this.contacts.size === 0) {
+      return false;
+    }
     for (const contact of this.contacts) {
       return contact.bodyA === bodyA && contact.bodyB === bodyB/*  ||
         contact.bodyA === bodyB && contact.bodyB === bodyA */;

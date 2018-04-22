@@ -19,7 +19,7 @@ const enum Flags {
 export class World {
   private static readonly DEFAULT_FLAGS = Flags.clearForces;
 
-  private bodies: Set<Body> = new Set<Body>();
+  private bodies: Body[] = [];
   private contactManager: ContactManager = new ContactManager(this);
   private flags: Flags = World.DEFAULT_FLAGS;
 
@@ -34,7 +34,7 @@ export class World {
   createBody(def: BodyDef): Body {
     this.flags |= Flags.newBodies;
     const body = new Body(def);
-    this.bodies.add(body);
+    this.bodies.push(body);
     return body;
   }
 
@@ -47,7 +47,12 @@ export class World {
   }
 
   destroyBody(body: Body): void {
-    this.bodies.delete(body);
+    for (let i = 0; i < this.bodies.length; i++) {
+      if (this.bodies[i] === body) {
+        this.bodies.splice(i, 1);
+        return;
+      }
+    }
   }
 
   drawDebugData(): void {
@@ -73,7 +78,7 @@ export class World {
     }
   }
 
-  getBodies(): Set<Body> {
+  getBodies(): Body[] {
     return this.bodies;
   }
 

@@ -25,13 +25,7 @@ export class Contact {
     const radiusA = bodyA.getRadius();
     const centerB = bodyB.getPosition();
     const radiusB = bodyB.getRadius();
-    if (!bodyA.inverse && !bodyB.inverse) {
-      return centerA.sub(centerB).mul(radiusB / (radiusA + radiusB)).add(centerB);
-    } else if (!bodyA.inverse && bodyB.inverse) {
-      return centerA.sub(centerB).mul(radiusB / (-radiusA + radiusB)).add(centerB);
-    } else if (bodyA.inverse && !bodyB.inverse) {
-      return centerB.sub(centerA).mul(radiusA / (radiusA - radiusB)).add(centerA);
-    }
+    return centerA.sub(centerB).mul(radiusB / (radiusA + radiusB)).add(centerB);
   }
 
   update(listener: void | ContactListener): void {

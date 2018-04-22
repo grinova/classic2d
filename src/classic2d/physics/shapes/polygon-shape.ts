@@ -26,6 +26,10 @@ export class PolygonShape implements Shape {
     return { mass, center };
   }
 
+  getRadius(): number {
+    return 0;
+  }
+
   getType(): ShapeType {
     return ShapeType.Polygon;
   }

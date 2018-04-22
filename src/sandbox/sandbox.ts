@@ -130,14 +130,13 @@ function createBody(
 ): Body {
   const shape = new CircleShape();
   shape.radius = radius;
-  const fd = { shape: shape, density };
+  const fd = { shape, density };
 
-  const bd: BodyDef = { position, angle, linearVelocity, angularVelocity };
+  const bd: BodyDef = { position, angle, linearVelocity, angularVelocity, inverse };
   const body = world.createBody(bd);
   if (isStatic) {
     body.type = BodyType.static;
   }
-  body.inverse = inverse;
 
   body.setFixture(fd);
   return body;
@@ -152,8 +151,8 @@ function createArena(world: World, radius: number): Body {
 }
 
 function createActors(world: World, count: number, arenaRadius: number): void {
-  const ACTOR_RADIUS = 0.05;
-  for (let i = 0; i < 20; i++) {
+  const ACTOR_RADIUS = 0.0125;
+  for (let i = 0; i < 200; i++) {
     const position = new Vec2(rand(arenaRadius - 2 * ACTOR_RADIUS), 0)
       .rotate(new Rot().setAngle(rand(2 * Math.PI)));
     const linearVelocity = new Vec2(rand(1, 0)).rotate(new Rot().setAngle(rand(2 * Math.PI)));

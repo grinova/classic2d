@@ -5,4 +5,5 @@ export interface BodyDef {
   angle: number;
   linearVelocity: Vec2;
   angularVelocity: number;
+  inverse?: boolean;
 }

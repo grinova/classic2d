@@ -16,9 +16,10 @@ export class Vec2 {
     return new Vec2(this.x, this.y);
   }
 
-  set(x: number, y: number) {
+  set(x: number, y: number): Vec2 {
     this.x = x;
     this.y = y;
+    return this;
   }
 
   set2(vec: Vec2): Vec2 {
