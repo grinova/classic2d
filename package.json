@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "webpack ./src/index.ts -o ./dist/index.js",
+    "build": "tsc -p tsconfig.json -d",
     "sandbox:build": "webpack ./src/sandbox/index.ts -o ./dist/sandbox.js",
     "sandbox:watch": "webpack ./src/sandbox/index.ts -o ./dist/sandbox.js --watch"
   },
