@@ -1,5 +1,5 @@
-import { Color } from 'classic2d/common/color';
-import { Vec2, Mat4 } from 'classic2d/math/common';
+import { Color } from '../../common/color';
+import { Mat4, Vec2 } from '../../math/common';
 
 export interface Draw {
   drawPolygon(m: Mat4, vertices: Vec2[], color: Color): void;

@@ -1,5 +1,5 @@
-import { Vec2 } from 'classic2d/math/common';
-import { Body } from 'classic2d/physics/body';
+import { Vec2 } from '../math/common';
+import { Body } from '../physics/body';
 
 const ds = new Vec2();
 

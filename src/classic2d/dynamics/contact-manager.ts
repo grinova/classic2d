@@ -1,9 +1,9 @@
-import { testOverlap } from 'classic2d/collision/collision';
-import { Contact } from 'classic2d/dynamics/contacts/contact';
-import { ContactListener } from 'classic2d/dynamics/world-callbacks';
-import { Vec2 } from 'classic2d/math/common';
-import { Body } from 'classic2d/physics/body';
-import { World } from 'classic2d/physics/world';
+import { Contact } from './contacts/contact';
+import { ContactListener } from './world-callbacks';
+import { testOverlap } from '../collision/collision';
+import { Vec2 } from '../math/common';
+import { Body } from '../physics/body';
+import { World } from '../physics/world';
 
 export class ContactManager {
   private world: World;

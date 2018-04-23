@@ -1,4 +1,4 @@
-import { Vec2 } from 'classic2d/math/common';
+import { Vec2 } from '../math/common';
 
 export interface MassData {
   mass: number;

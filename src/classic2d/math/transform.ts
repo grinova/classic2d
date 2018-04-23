@@ -1,5 +1,5 @@
-import { Rot } from 'classic2d/math/rot';
-import { Vec2 } from 'classic2d/math/vec2';
+import { Rot } from './rot';
+import { Vec2 } from './vec2';
 
 export class Transform {
   pos: Vec2;

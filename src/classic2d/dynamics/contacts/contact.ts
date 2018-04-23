@@ -1,7 +1,7 @@
-import { testOverlap } from 'classic2d/collision/collision';
-import { ContactListener } from 'classic2d/dynamics/world-callbacks';
-import { Vec2 } from 'classic2d/math/common';
-import { Body } from 'classic2d/physics/body';
+import { testOverlap } from '../../collision/collision';
+import { Vec2 } from '../../math/common';
+import { Body } from '../../physics/body';
+import { ContactListener } from '../world-callbacks';
 
 export const enum ContactFlags {
   touching = 1,

@@ -1,7 +1,7 @@
-import { ContactFlags } from 'classic2d/dynamics/contacts/contact';
-import { Rot, Vec2 } from 'classic2d/math/common';
-import { Body, BodyType } from 'classic2d/physics/body';
-import { World } from 'classic2d/physics/world';
+import { Rot, Vec2 } from '../../math/common';
+import { Body, BodyType } from '../../physics/body';
+import { World } from '../../physics/world';
+import { ContactFlags } from '../contacts/contact';
 
 export class ContactSolver {
   private world: World;

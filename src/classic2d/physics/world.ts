@@ -1,15 +1,15 @@
-import { Color } from 'classic2d/common/color';
-import { COLORS } from 'classic2d/common/settings';
-import { ContactManager } from 'classic2d/dynamics/contact-manager';
-import { ContactSolver } from 'classic2d/dynamics/contacts/contact-solver';
-import { ContactListener } from 'classic2d/dynamics/world-callbacks';
-import { Draw } from 'classic2d/graphics/common/draw';
-import { Mat4, Transform, Vec2 } from 'classic2d/math/common';
-import { Body, BodyType } from 'classic2d/physics/body';
-import { BodyDef } from 'classic2d/physics/body-def';
-import { Fixture } from 'classic2d/physics/fixture';
-import { CircleShape } from 'classic2d/physics/shapes/circle-shape';
-import { ShapeType } from 'classic2d/physics/shapes/shape';
+import { Body, BodyType } from './body';
+import { BodyDef } from './body-def';
+import { Fixture } from './fixture';
+import { CircleShape } from './shapes/circle-shape';
+import { ShapeType } from './shapes/shape';
+import { Color } from '../common/color';
+import { COLORS } from '../common/settings';
+import { ContactManager } from '../dynamics/contact-manager';
+import { ContactSolver } from '../dynamics/contacts/contact-solver';
+import { ContactListener } from '../dynamics/world-callbacks';
+import { Draw } from '../graphics/common/draw';
+import { Mat4, Transform, Vec2 } from '../math/common';
 
 const enum Flags {
   newBodies = 1,

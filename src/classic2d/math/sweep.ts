@@ -1,4 +1,4 @@
-import { Vec2 } from 'classic2d/math/vec2';
+import { Vec2 } from './vec2';
 
 export class Sweep {
   c: Vec2;

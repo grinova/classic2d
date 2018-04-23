@@ -1,4 +1,4 @@
-import { Rot } from 'classic2d/math/rot';
+import { Rot } from './rot';
 
 export class Vec2 {
   x: number;

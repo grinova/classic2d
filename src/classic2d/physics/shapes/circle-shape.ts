@@ -1,6 +1,6 @@
-import { Vec2 } from 'classic2d/math/common';
-import { MassData } from 'classic2d/physics/mass-data';
-import { Shape, ShapeType } from 'classic2d/physics/shapes/shape';
+import { Vec2 } from '../../math/common';
+import { MassData } from '../mass-data';
+import { Shape, ShapeType } from '../shapes/shape';
 
 export class CircleShape implements Shape {
   radius: number = 1;

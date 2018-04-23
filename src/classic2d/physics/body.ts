@@ -1,9 +1,9 @@
-import { Mat4, Sweep, Transform, Vec2 } from 'classic2d/math/common';
-import { BodyDef } from 'classic2d/physics/body-def';
-import { Fixture } from 'classic2d/physics/fixture';
-import { FixtureDef } from 'classic2d/physics/fixture-def';
-import { MassData } from 'classic2d/physics/mass-data';
-import { CircleShape } from 'classic2d/physics/shapes/circle-shape';
+import { BodyDef } from './body-def';
+import { Fixture } from './fixture';
+import { FixtureDef } from './fixture-def';
+import { MassData } from './mass-data';
+import { CircleShape } from './shapes/circle-shape';
+import { Mat4, Sweep, Transform, Vec2 } from '../math/common';
 
 export const enum BodyType {
   static,

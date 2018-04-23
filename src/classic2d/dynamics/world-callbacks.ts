@@ -1,4 +1,4 @@
-import { Contact } from 'classic2d/dynamics/contacts/contact';
+import { Contact } from './contacts/contact';
 
 export abstract class ContactListener {
   abstract beginContact(contact: Contact): void;

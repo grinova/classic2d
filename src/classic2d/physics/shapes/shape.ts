@@ -1,4 +1,4 @@
-import { MassData } from 'classic2d/physics/mass-data';
+import { MassData } from '../mass-data';
 
 export enum ShapeType {
   Circle,
