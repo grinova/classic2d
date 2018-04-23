@@ -1,14 +1,9 @@
 const path = require('path');
 
-const buildDir = path.resolve(__dirname, 'build');
 const srcDir = path.resolve(__dirname, 'src');
 
 module.exports = {
-  entry: './src/sandbox/index.ts',
-  output: {
-    filename: 'bundle.js',
-    path: buildDir
-  },
+  mode: 'none',
   devtool: 'source-map',
   module: {
     rules: [

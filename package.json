@@ -2,11 +2,12 @@
   "name": "classic2d",
   "version": "0.0.0",
   "description": "",
-  "main": "webpack.config.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "sandbox:build": "./node_modules/.bin/webpack",
-    "sandbox:watch": "./node_modules/.bin/webpack --watch",
-    "test": "tests"
+    "build": "webpack ./src/index.ts -o ./dist/index.js",
+    "sandbox:build": "webpack ./src/sandbox/index.ts -o ./dist/sandbox.js",
+    "sandbox:watch": "webpack ./src/sandbox/index.ts -o ./dist/sandbox.js --watch"
   },
   "repository": {
     "type": "git",
@@ -15,10 +16,11 @@
   "author": "Aleksandr Kuzmin",
   "license": "MIT",
   "devDependencies": {
-    "ts-loader": "^3.4.0",
+    "ts-loader": "^4.2.0",
     "tslint": "^5.9.1",
     "tslint-config-standard": "^7.0.0",
-    "typescript": "^2.7.1",
-    "webpack": "^3.10.0"
+    "typescript": "^2.8.3",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.15"
   }
 }
