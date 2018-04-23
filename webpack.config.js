@@ -4,7 +4,7 @@ const buildDir = path.resolve(__dirname, 'build');
 const srcDir = path.resolve(__dirname, 'src');
 
 module.exports = {
-  entry: './src/sandbox/sandbox.ts',
+  entry: './src/sandbox/index.ts',
   output: {
     filename: 'bundle.js',
     path: buildDir
