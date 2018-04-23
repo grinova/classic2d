@@ -1,14 +1,42 @@
-import { World } from 'classic2d/classic2d';
-import { setCanvasSize } from 'sandbox/common/dom';
-import { ContactListener } from 'sandbox/contact-listener';
-import { Camera, DebugDraw } from 'sandbox/debug-draw';
-import { MovingAverage } from 'sandbox/moving-average';
+import { World } from '../classic2d/classic2d';
+import { appendDomElement, setCanvasSize } from './common/dom';
+import { ContactListener } from './contact-listener';
+import { Camera, DebugDraw } from './debug-draw';
+import { MovingAverage } from './moving-average';
+
+export function createSandbox(options: SandboxOptionsBase, parent: HTMLElement = document.body) {
+  const { element: canvasWebgl, remove: removeCanvasWebgl } = appendDomElement('canvas', parent);
+  const { element: canvas2d, remove: removeCanvas2d } = appendDomElement('canvas', parent);
+  parent.style.overflow = 'hidden';
+  parent.style.margin = '0px';
+  canvasWebgl.style.position = 'absolute';
+  canvas2d.style.position = 'absolute';
+
+  const sandbox = new Sandbox({ ...options, canvasWebgl, canvas2d });
+  const remove = () => {
+    sandbox.stop();
+    removeCanvasWebgl();
+    removeCanvas2d();
+  };
+  return { sandbox, remove };
+}
 
 export type ActionHandler = (world: World) => void;
 
 export interface Actions {
   init: ActionHandler;
   reset: ActionHandler;
+}
+
+export interface SandboxOptionsBase {
+  actions?: void | Actions;
+  width: number;
+  height: number;
+}
+
+export interface SandboxOptions extends SandboxOptionsBase {
+  canvasWebgl: HTMLCanvasElement;
+  canvas2d: HTMLCanvasElement;
 }
 
 export class Sandbox {
@@ -25,13 +53,13 @@ export class Sandbox {
   private isPause = false;
   private makeStep = false;
   private frameTimeMovingAverage = new MovingAverage(60);
+  private running: boolean = false;
 
-  constructor(actions?: void | Actions) {
+  constructor(options: SandboxOptions) {
+    const { actions, canvasWebgl, canvas2d, width, height } = options;
     this.actions = actions;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    this.canvasWebgl = document.getElementById('canvas-webgl') as HTMLCanvasElement;
-    this.canvas2d = document.getElementById('canvas-2d') as HTMLCanvasElement;
+    this.canvasWebgl = canvasWebgl;
+    this.canvas2d = canvas2d;
 
     setCanvasSize(this.canvasWebgl, width, height);
     setCanvasSize(this.canvas2d, width, height);
@@ -48,13 +76,23 @@ export class Sandbox {
 
     this.debugDraw = new DebugDraw(this.gl, gl2d, this.camera);
     this.world.setDebugDraw(this.debugDraw);
+  }
 
-    window.onresize = this.handleResize;
-    window.onkeydown = this.handleKeyDown;
+  keyDown(event: KeyboardEvent): void {
+    this.handleKeyDown(event);
+  }
+
+  resize(width: number, height: number): void {
+    this.handleResize(width, height);
   }
 
   run(): void {
+    this.running = true;
     requestAnimationFrame(this.render);
+  }
+
+  stop(): void {
+    this.running = false;
   }
 
   private draw(): void {
@@ -69,18 +107,15 @@ export class Sandbox {
     this.world.drawDebugData();
   }
 
-  private handleResize = (): void => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
+  private handleResize(width: number, height: number): void {
     this.camera.width = width;
     this.camera.height = height;
 
     setCanvasSize(this.canvasWebgl, width, height);
     setCanvasSize(this.canvas2d, width, height);
-  };
+  }
 
-  private handleKeyDown = (event: KeyboardEvent): void => {
+  private handleKeyDown(event: KeyboardEvent): void {
     switch (event.key) {
       case 'r':
         if (this.actions) {
@@ -95,9 +130,11 @@ export class Sandbox {
         this.isPause = true;
         break;
     }
-  };
-
+  }
   private render = (now: number): void => {
+    if (!this.running) {
+      return;
+    }
     const time = now - this.past;
     this.past = now;
     if (!this.isPause || this.makeStep) {

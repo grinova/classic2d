@@ -7,7 +7,7 @@ import {
   Vec2,
   World
 } from 'classic2d/classic2d';
-import { Sandbox } from 'sandbox/sandbox';
+import { createSandbox } from 'sandbox/sandbox';
 
 function createBody(
   world: World,
@@ -68,6 +68,16 @@ window.onload = () => {
     init: resetWorld,
     reset: resetWorld
   };
-  const sandbox = new Sandbox(actions);
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const { sandbox } = createSandbox({ actions, width, height });
+  const resize = (): void => {
+    sandbox.resize(window.innerWidth, window.innerHeight);
+  };
+  const keyDown = (event: KeyboardEvent): void => {
+    sandbox.keyDown(event);
+  };
+  window.addEventListener('resize', resize);
+  window.addEventListener('keydown', keyDown);
   sandbox.run();
 };
