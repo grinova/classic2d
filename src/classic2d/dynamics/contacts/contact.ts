@@ -3,7 +3,7 @@ import { Vec2 } from '../../math/common';
 import { Body } from '../../physics/body';
 import { ContactListener } from '../world-callbacks';
 
-export const enum ContactFlags {
+export enum ContactFlags {
   touching = 1,
   wasTouching = 2
 }

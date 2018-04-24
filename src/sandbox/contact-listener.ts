@@ -1,7 +1,7 @@
 import {
   Contact,
   ContactListener as BaseContactListener
-} from 'classic2d/classic2d';
+} from '../classic2d/classic2d';
 
 export class ContactListener extends BaseContactListener {
   on: boolean = false;

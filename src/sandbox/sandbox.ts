@@ -24,8 +24,8 @@ export function createSandbox(options: SandboxOptionsBase, parent: HTMLElement =
 export type ActionHandler = (world: World) => void;
 
 export interface Actions {
-  init: ActionHandler;
-  reset: ActionHandler;
+  init?: void | ActionHandler;
+  reset?: void | ActionHandler;
 }
 
 export interface SandboxOptionsBase {
@@ -67,7 +67,7 @@ export class Sandbox {
     this.camera = new Camera(0, 0, 0, width, height);
     this.world = new World();
     this.world.setContactListener(new ContactListener());
-    if (this.actions) {
+    if (this.actions && this.actions.init) {
       this.actions.init(this.world);
     }
 
@@ -118,7 +118,7 @@ export class Sandbox {
   private handleKeyDown(event: KeyboardEvent): void {
     switch (event.key) {
       case 'r':
-        if (this.actions) {
+        if (this.actions && this.actions.reset) {
           this.actions.reset(this.world);
         }
         break;

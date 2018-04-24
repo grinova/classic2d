@@ -5,17 +5,18 @@ import { MassData } from './mass-data';
 import { CircleShape } from './shapes/circle-shape';
 import { Mat4, Sweep, Transform, Vec2 } from '../math/common';
 
-export const enum BodyType {
+export enum BodyType {
   static,
   dynamic
 }
 
-export class Body {
+export class Body<T = any> {
   type: BodyType = BodyType.dynamic;
   linearVelocity: Vec2;
   angularVelocity: number;
   force: Vec2 = new Vec2();
   sweep: Sweep = new Sweep();
+  userData: T;
 
   private massData: MassData;
   private fixture: Fixture;

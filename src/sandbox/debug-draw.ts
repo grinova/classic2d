@@ -4,8 +4,8 @@ import {
   Draw,
   Mat4,
   Vec2
-} from 'classic2d/classic2d';
-import { Exception } from 'sandbox/common/common';
+} from '../classic2d/classic2d';
+import { Exception } from './common/common';
 
 const WHITE = '#FFFFFF';
 

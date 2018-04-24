@@ -8,7 +8,7 @@ import { World } from '../physics/world';
 export class ContactManager {
   private world: World;
 
-  private contacts: Set<Contact> = new Set<Contact>();
+  private contacts: Contact[] = [];
   private contactListener: void | ContactListener;
 
   constructor(world: World) {
@@ -16,7 +16,7 @@ export class ContactManager {
   }
 
   addPair(bodyA: Body, bodyB: Body): void {
-    this.contacts.add(new Contact(bodyA, bodyB));
+    this.contacts.push(new Contact(bodyA, bodyB));
   }
 
   collide(): void {
@@ -40,7 +40,12 @@ export class ContactManager {
   }
 
   destroy(contact: Contact): void {
-    this.contacts.delete(contact);
+    for (let i = 0; i < this.contacts.length; i++) {
+      if (contact === this.contacts[i]) {
+        this.contacts.splice(i, 1);
+        return;
+      }
+    }
   }
 
   findNewContacts(): void {
@@ -59,7 +64,7 @@ export class ContactManager {
     }
   }
 
-  getContacts(): Set<Contact> {
+  getContacts(): Contact[] {
     return this.contacts;
   }
 
@@ -68,7 +73,7 @@ export class ContactManager {
   }
 
   private hasContact(bodyA: Body, bodyB: Body): boolean {
-    if (this.contacts.size === 0) {
+    if (this.contacts.length === 0) {
       return false;
     }
     for (const contact of this.contacts) {
