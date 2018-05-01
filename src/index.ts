@@ -1,4 +1,5 @@
 import { Color as _Color, COLOR_COMPONENTS as _COLOR_COMPONENTS } from './classic2d/common/color';
+import { ContactManager as _ContactManager } from './classic2d/dynamics/contact-manager';
 import { Contact as _Contact, ContactFlags as _ContactFlags } from './classic2d/dynamics/contacts/contact';
 import { ContactListener as _ContactListener } from './classic2d/dynamics/world-callbacks';
 import { Draw as _Draw } from './classic2d/graphics/common/draw';
@@ -23,7 +24,7 @@ import {
 
 namespace classic2d {
   export const Body = _Body;
-  export type Body = _Body;
+  export type Body<T = any> = _Body<T>;
   export type BodyDef = _BodyDef;
   export const BodyType = _BodyType;
   export type BodyType = _BodyType;
@@ -32,11 +33,13 @@ namespace classic2d {
   export type Color = _Color;
   export const COLOR_COMPONENTS = _COLOR_COMPONENTS;
   export const Contact = _Contact;
-  export type Contact = _Contact;
+  export type Contact<T = any> = _Contact<T>;
   export const ContactFlags = _ContactFlags;
   export type ContactFlags = _ContactFlags;
   export const ContactListener = _ContactListener;
-  export type ContactListener = _ContactListener;
+  export type ContactListener<T = any> = _ContactListener<T>;
+  export const ContactManager = _ContactManager;
+  export type ContactManager<T = any> = _ContactManager<T>;
   export type Draw = _Draw;
   export type FixtureDef = _FixtureDef;
   export const Mat4 = _Mat4;
@@ -50,7 +53,7 @@ namespace classic2d {
   export const Vec2 = _Vec2;
   export type Vec2 = _Vec2;
   export const World = _World;
-  export type World = _World;
+  export type World<T = any> = _World<T>;
   export const createSandbox = _createSandbox;
   export const Sandbox = _Sandbox;
   export type Sandbox = _Sandbox;

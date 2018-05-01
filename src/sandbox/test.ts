@@ -5,28 +5,47 @@ import { COLORS } from '../classic2d/common/settings';
 import { Contact } from '../classic2d/dynamics/contacts/contact';
 import { World } from '../classic2d/physics/world';
 
-export class Test extends ContactListener {
+export class Test<T = any> extends ContactListener<T> {
   private world: World;
   private debugDraw: DebugDraw;
+  private contactListener?: void | ContactListener<T>;
 
   private contacts: Contact[];
   private frameTimeMovingAverage = new MovingAverage(60);
   private isPause: boolean = false;
   private shouldMakeStep: boolean = false;
 
-  constructor(world: World, debugDraw: DebugDraw) {
+  constructor(world: World, debugDraw: DebugDraw, contactListener?: void | ContactListener<T>) {
     super();
     this.world = world;
     this.debugDraw = debugDraw;
+    this.contactListener = contactListener;
     this.world.setDebugDraw(this.debugDraw);
     this.world.setContactListener(this);
     this.clearContacts();
   }
 
-  beginContact(contact: Contact): void {
+  beginContact(contact: Contact<T>): void {
     super.beginContact(contact);
     if (!this.hasContact(contact)) {
       this.contacts.push(contact);
+    }
+    if (this.contactListener) {
+      this.contactListener.beginContact(contact);
+    }
+  }
+
+  endContact(contact: Contact<T>): void {
+    super.endContact(contact);
+    if (this.contactListener) {
+      this.contactListener.endContact(contact);
+    }
+  }
+
+  preSolve(contact: Contact<T>): void {
+    super.preSolve(contact);
+    if (this.contactListener) {
+      this.contactListener.preSolve(contact);
     }
   }
 

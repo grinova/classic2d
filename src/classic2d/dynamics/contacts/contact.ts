@@ -8,13 +8,13 @@ export enum ContactFlags {
   wasTouching = 2
 }
 
-export class Contact {
-  bodyA: Body;
-  bodyB: Body;
+export class Contact<T = any> {
+  bodyA: Body<T>;
+  bodyB: Body<T>;
 
   flags: ContactFlags = 0;
 
-  constructor(bodyA: Body, bodyB: Body) {
+  constructor(bodyA: Body<T>, bodyB: Body<T>) {
     this.bodyA = bodyA;
     this.bodyB = bodyB;
   }
@@ -28,7 +28,7 @@ export class Contact {
     return centerA.sub(centerB).mul(radiusB / (radiusA + radiusB)).add(centerB);
   }
 
-  update(listener: void | ContactListener): void {
+  update(listener: void | ContactListener<T>): void {
     const wasTouching = this.flags & ContactFlags.touching;
     if (wasTouching) {
       this.flags |= ContactFlags.wasTouching;

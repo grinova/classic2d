@@ -5,17 +5,17 @@ import { Vec2 } from '../math/common';
 import { Body } from '../physics/body';
 import { World } from '../physics/world';
 
-export class ContactManager {
-  private world: World;
+export class ContactManager<T = any> {
+  private world: World<T>;
 
-  private contacts: Contact[] = [];
-  private contactListener: void | ContactListener;
+  private contacts: Contact<T>[] = [];
+  private contactListener: void | ContactListener<T>;
 
-  constructor(world: World) {
+  constructor(world: World<T>) {
     this.world = world;
   }
 
-  addPair(bodyA: Body, bodyB: Body): Contact {
+  addPair(bodyA: Body<T>, bodyB: Body<T>): Contact<T> {
     const contact = new Contact(bodyA, bodyB);
     this.contacts.push(contact);
     return contact;
@@ -66,11 +66,11 @@ export class ContactManager {
     }
   }
 
-  getContacts(): Contact[] {
+  getContacts(): Contact<T>[] {
     return this.contacts;
   }
 
-  setContactListener(listener: ContactListener): void {
+  setContactListener(listener: ContactListener<T>): void {
     this.contactListener = listener;
   }
 

@@ -16,11 +16,11 @@ const enum Flags {
   clearForces = 2
 }
 
-export class World {
+export class World<T = any> {
   private static readonly DEFAULT_FLAGS = Flags.clearForces;
 
-  private bodies: Body[] = [];
-  private contactManager: ContactManager = new ContactManager(this);
+  private bodies: Body<T>[] = [];
+  private contactManager: ContactManager<T> = new ContactManager<T>(this);
   private flags: Flags = World.DEFAULT_FLAGS;
 
   private draw: void | Draw;
@@ -31,9 +31,9 @@ export class World {
     }
   }
 
-  createBody(def: BodyDef): Body {
+  createBody(def: BodyDef): Body<T> {
     this.flags |= Flags.newBodies;
-    const body = new Body(def);
+    const body = new Body<T>(def);
     this.bodies.push(body);
     return body;
   }
@@ -73,15 +73,15 @@ export class World {
     }
   }
 
-  getBodies(): Body[] {
+  getBodies(): Body<T>[] {
     return this.bodies;
   }
 
-  getContactManager(): ContactManager {
+  getContactManager(): ContactManager<T> {
     return this.contactManager;
   }
 
-  setContactListener(listener: ContactListener): void {
+  setContactListener(listener: ContactListener<T>): void {
     this.contactManager.setContactListener(listener);
   }
 
