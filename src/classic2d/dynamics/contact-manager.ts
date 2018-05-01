@@ -15,8 +15,10 @@ export class ContactManager {
     this.world = world;
   }
 
-  addPair(bodyA: Body, bodyB: Body): void {
-    this.contacts.push(new Contact(bodyA, bodyB));
+  addPair(bodyA: Body, bodyB: Body): Contact {
+    const contact = new Contact(bodyA, bodyB);
+    this.contacts.push(contact);
+    return contact;
   }
 
   collide(): void {
