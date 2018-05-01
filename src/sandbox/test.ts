@@ -1,8 +1,8 @@
-import { ContactListener } from './contact-listener';
 import { DebugDraw } from './debug-draw';
 import { MovingAverage } from './moving-average';
 import { COLORS } from '../classic2d/common/settings';
 import { Contact } from '../classic2d/dynamics/contacts/contact';
+import { ContactListener } from '../classic2d/dynamics/world-callbacks';
 import { World } from '../classic2d/physics/world';
 
 export class Test<T = any> extends ContactListener<T> {
@@ -26,7 +26,6 @@ export class Test<T = any> extends ContactListener<T> {
   }
 
   beginContact(contact: Contact<T>): void {
-    super.beginContact(contact);
     if (!this.hasContact(contact)) {
       this.contacts.push(contact);
     }
@@ -36,14 +35,12 @@ export class Test<T = any> extends ContactListener<T> {
   }
 
   endContact(contact: Contact<T>): void {
-    super.endContact(contact);
     if (this.contactListener) {
       this.contactListener.endContact(contact);
     }
   }
 
   preSolve(contact: Contact<T>): void {
-    super.preSolve(contact);
     if (this.contactListener) {
       this.contactListener.preSolve(contact);
     }
@@ -63,6 +60,10 @@ export class Test<T = any> extends ContactListener<T> {
 
   pause(isPause: boolean): void {
     this.isPause = isPause;
+  }
+
+  setContactListener(contactListener: ContactListener): void {
+    this.contactListener = contactListener;
   }
 
   step(time: number): void {

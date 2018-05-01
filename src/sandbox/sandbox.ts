@@ -1,9 +1,8 @@
 import { appendDomElement, setCanvasSize } from './common/dom';
-import { ContactListener } from './contact-listener';
 import { Camera, DebugDraw } from './debug-draw';
 import { MovingAverage } from './moving-average';
 import { Test } from './test';
-import { World } from '../classic2d/classic2d';
+import { ContactListener, World } from '../classic2d/classic2d';
 
 export function createSandbox(options: SandboxOptionsBase, parent: HTMLElement = document.body) {
   const { element: canvasWebgl, remove: removeCanvasWebgl } = appendDomElement('canvas', parent);
@@ -22,7 +21,7 @@ export function createSandbox(options: SandboxOptionsBase, parent: HTMLElement =
   return { sandbox, remove };
 }
 
-export type ActionHandler = (world: World) => void;
+export type ActionHandler = (world: World, sandbox: Sandbox) => void;
 
 export interface Actions {
   init?: void | ActionHandler;
@@ -68,15 +67,15 @@ export class Sandbox {
 
     this.camera = new Camera(0, 0, 0, width, height);
     this.world = new World();
-    if (this.actions && this.actions.init) {
-      this.actions.init(this.world);
-    }
 
     this.gl = this.canvasWebgl.getContext('webgl') || this.canvasWebgl.getContext('experimental-webgl');
     const gl2d = this.canvas2d.getContext('2d');
 
     this.debugDraw = new DebugDraw(this.gl, gl2d, this.camera);
     this.test = new Test(this.world, this.debugDraw);
+    if (this.actions && this.actions.init) {
+      this.actions.init(this.world, this);
+    }
   }
 
   keyDown(event: KeyboardEvent): void {
@@ -90,6 +89,10 @@ export class Sandbox {
   run(): void {
     this.running = true;
     requestAnimationFrame(this.render);
+  }
+
+  setContactListener(contactListener: ContactListener): void {
+    this.test.setContactListener(contactListener);
   }
 
   stop(): void {
@@ -118,7 +121,7 @@ export class Sandbox {
     switch (event.key) {
       case 'r':
         if (this.actions && this.actions.reset) {
-          this.actions.reset(this.world);
+          this.actions.reset(this.world, this);
         }
         break;
       case 'p':
