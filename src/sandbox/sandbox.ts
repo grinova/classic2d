@@ -1,8 +1,9 @@
-import { World } from '../classic2d/classic2d';
 import { appendDomElement, setCanvasSize } from './common/dom';
 import { ContactListener } from './contact-listener';
 import { Camera, DebugDraw } from './debug-draw';
 import { MovingAverage } from './moving-average';
+import { Test } from './test';
+import { World } from '../classic2d/classic2d';
 
 export function createSandbox(options: SandboxOptionsBase, parent: HTMLElement = document.body) {
   const { element: canvasWebgl, remove: removeCanvasWebgl } = appendDomElement('canvas', parent);
@@ -48,6 +49,7 @@ export class Sandbox {
   private camera: Camera;
   private world: World;
   private debugDraw: DebugDraw;
+  private test: Test;
 
   private past = 0;
   private isPause = false;
@@ -66,7 +68,6 @@ export class Sandbox {
 
     this.camera = new Camera(0, 0, 0, width, height);
     this.world = new World();
-    this.world.setContactListener(new ContactListener());
     if (this.actions && this.actions.init) {
       this.actions.init(this.world);
     }
@@ -75,7 +76,7 @@ export class Sandbox {
     const gl2d = this.canvas2d.getContext('2d');
 
     this.debugDraw = new DebugDraw(this.gl, gl2d, this.camera);
-    this.world.setDebugDraw(this.debugDraw);
+    this.test = new Test(this.world, this.debugDraw);
   }
 
   keyDown(event: KeyboardEvent): void {
@@ -95,7 +96,7 @@ export class Sandbox {
     this.running = false;
   }
 
-  private draw(): void {
+  private clearFrame(): void {
     const { gl } = this;
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -103,8 +104,6 @@ export class Sandbox {
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LEQUAL);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    this.world.drawDebugData();
   }
 
   private handleResize(width: number, height: number): void {
@@ -131,28 +130,16 @@ export class Sandbox {
         break;
     }
   }
+
   private render = (now: number): void => {
     if (!this.running) {
       return;
     }
     const time = now - this.past;
     this.past = now;
-    if (!this.isPause || this.makeStep) {
-      this.world.step(time);
-      this.makeStep = false;
-    }
-    this.draw();
-    const averageFrameTime = this.frameTimeMovingAverage.get(time);
-    const help = '[R] - reset; [P] - pause; [O] - step';
-    const fps = 'FPS: ' + Math.floor(1000 / averageFrameTime).toString();
-    const frame = 'Frame time: ' + averageFrameTime.toFixed(3).toString() + ' ms';
-    this.debugDraw.printText(help);
-    this.debugDraw.printText(fps);
-    this.debugDraw.printText(frame);
-    if (this.isPause) {
-      this.debugDraw.printText('[PAUSE]');
-    }
-    this.debugDraw.flush();
+    this.test.step(time);
+    this.clearFrame();
+    this.test.draw(time);
 
     requestAnimationFrame(this.render);
   }

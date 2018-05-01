@@ -44,7 +44,8 @@ function createArena(world: World, radius: number): Body {
 
 function createActors(world: World, count: number, arenaRadius: number): void {
   const ACTOR_RADIUS = 0.05;
-  for (let i = 0; i < 20; i++) {
+  const ACTORS_COUNT = 40;
+  for (let i = 0; i < ACTORS_COUNT; i++) {
     const position = new Vec2(rand(arenaRadius - 2 * ACTOR_RADIUS), 0)
       .rotate(new Rot().setAngle(rand(2 * Math.PI)));
     const linearVelocity = new Vec2(rand(1, 0)).rotate(new Rot().setAngle(rand(2 * Math.PI)));

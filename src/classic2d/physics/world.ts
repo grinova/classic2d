@@ -71,11 +71,6 @@ export class World {
           break;
       }
     }
-    const contacts = this.contactManager.getContacts();
-    for (const contact of contacts) {
-      const point = contact.getPoint();
-      this.draw.drawPoint(point, COLORS.CONTACT);
-    }
   }
 
   getBodies(): Body[] {
