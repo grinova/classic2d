@@ -26,6 +26,9 @@ export type ActionHandler = (world: World, sandbox: Sandbox) => void;
 export interface Actions {
   init?: void | ActionHandler;
   reset?: void | ActionHandler;
+  keyDown?: void | ((event: KeyboardEvent) => void);
+  preStep?: void | (() => void);
+  postStep?: void | (() => void);
 }
 
 export interface SandboxOptionsBase {
@@ -51,9 +54,6 @@ export class Sandbox {
   private test: Test;
 
   private past = 0;
-  private isPause = false;
-  private makeStep = false;
-  private frameTimeMovingAverage = new MovingAverage(60);
   private running: boolean = false;
 
   constructor(options: SandboxOptions) {
@@ -129,12 +129,16 @@ export class Sandbox {
         }
         break;
       case 'p':
-        this.isPause = !this.isPause;
+        this.test.pause();
         break;
       case 'o':
-        this.makeStep = true;
-        this.isPause = true;
+        this.test.pause(true);
+        this.test.makeStep();
         break;
+      default:
+        if (this.actions && this.actions.keyDown) {
+          this.actions.keyDown(event);
+        }
     }
   }
 
@@ -142,9 +146,15 @@ export class Sandbox {
     if (!this.running) {
       return;
     }
+    if (this.actions && this.actions.preStep) {
+      this.actions.preStep();
+    }
     const time = now - this.past;
     this.past = now;
     this.test.step(time);
+    if (this.actions && this.actions.postStep) {
+      this.actions.postStep();
+    }
     this.clearFrame();
     this.test.draw(time);
 

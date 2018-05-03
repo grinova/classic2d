@@ -58,7 +58,7 @@ export class Test<T = any> extends ContactListener<T> {
     this.shouldMakeStep = true;
   }
 
-  pause(isPause: boolean): void {
+  pause(isPause: boolean = !this.isPause): void {
     this.isPause = isPause;
   }
 
@@ -92,6 +92,9 @@ export class Test<T = any> extends ContactListener<T> {
     this.debugDraw.printText(help);
     this.debugDraw.printText(fps);
     this.debugDraw.printText(frame);
+    if (this.isPause) {
+      this.debugDraw.printText('[PAUSE]');
+    }
   }
 
   private hasContact(contact: Contact): boolean {
