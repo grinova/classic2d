@@ -99,6 +99,10 @@ export class Sandbox {
     this.running = false;
   }
 
+  zoom(zoom: number): void {
+    this.camera.zoom = zoom;
+  }
+
   private clearFrame(): void {
     const { gl } = this;
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
