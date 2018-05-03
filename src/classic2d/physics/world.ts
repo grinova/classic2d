@@ -130,9 +130,7 @@ export class World<T = any> {
     }
 
     if (this.flags & Flags.clearForces) {
-      for (const body of this.bodies) {
-        body.force.set(0, 0);
-      }
+      this.clearForces();
     }
   }
 

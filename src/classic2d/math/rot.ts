@@ -2,6 +2,10 @@ export class Rot {
   c: number = 1;
   s: number = 0;
 
+  copy(): Rot {
+    return new Rot().setXY(this.c, this.s);
+  }
+
   getAngle(): number {
     return Math.atan2(this.s, this.c);
   }

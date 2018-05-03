@@ -3,7 +3,7 @@ import { Fixture } from './fixture';
 import { FixtureDef } from './fixture-def';
 import { MassData } from './mass-data';
 import { CircleShape } from './shapes/circle-shape';
-import { Mat4, Sweep, Transform, Vec2 } from '../math/common';
+import { Mat4, Rot, Sweep, Transform, Vec2 } from '../math/common';
 
 export enum BodyType {
   static,
@@ -31,6 +31,10 @@ export class Body<T = any> {
     this.linearVelocity = def.linearVelocity.copy();
     this.angularVelocity = def.angularVelocity;
     this.inverse = def.inverse;
+  }
+
+  applyForce(force: Vec2): void {
+    this.force.add(force);
   }
 
   getInverse(): boolean {
@@ -80,6 +84,10 @@ export class Body<T = any> {
 
   getPosition(): Vec2 {
     return this.xf.pos.copy();
+  }
+
+  getRot(): Rot {
+    return this.xf.rot.copy();
   }
 
   synchronize(): void {
