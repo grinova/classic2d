@@ -15,6 +15,7 @@ export class Body<T = any> {
   linearVelocity: Vec2;
   angularVelocity: number;
   force: Vec2 = new Vec2();
+  torque: number = 0;
   sweep: Sweep = new Sweep();
   userData: T;
 
@@ -88,6 +89,10 @@ export class Body<T = any> {
 
   getRot(): Rot {
     return this.xf.rot.copy();
+  }
+
+  setTorque(torque: number): void {
+    this.torque = torque;
   }
 
   synchronize(): void {

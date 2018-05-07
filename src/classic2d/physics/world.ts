@@ -112,6 +112,7 @@ export class World<T = any> {
         const pos = body.getPosition();
         pos.add(vs);
         pos.add(as);
+        body.angularVelocity += body.torque * T;
         const da = body.angularVelocity * T;
 
         body.linearVelocity.add(a);
