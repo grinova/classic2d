@@ -36,9 +36,7 @@ export class ContactManager<T = any> {
   }
 
   clear(): void {
-    for (const contact of this.contacts) {
-      this.destroy(contact);
-    }
+    this.contacts = [];
   }
 
   destroy(contact: Contact): void {

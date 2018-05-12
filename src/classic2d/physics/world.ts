@@ -39,9 +39,7 @@ export class World<T = any> {
   }
 
   clear(): void {
-    for (const body of this.bodies) {
-      this.destroyBody(body);
-    }
+    this.bodies = [];
     this.contactManager.clear();
     this.flags = World.DEFAULT_FLAGS;
   }
@@ -105,7 +103,6 @@ export class World<T = any> {
         if (body.type === BodyType.static) {
           continue;
         }
-        const m = body.getMassData().mass;
         const a = body.force.copy().mul(T);
         const vs = body.linearVelocity.copy().mul(T);
         const as = a.copy().mul(T * T / 2);

@@ -29,7 +29,7 @@ export class Contact<T = any> {
   }
 
   update(listener: void | ContactListener<T>): void {
-    const wasTouching = this.flags & ContactFlags.touching;
+    const wasTouching = (this.flags & ContactFlags.touching) === ContactFlags.touching;
     if (wasTouching) {
       this.flags |= ContactFlags.wasTouching;
     }
@@ -45,12 +45,12 @@ export class Contact<T = any> {
     if (!wasTouching && touching) {
       listener.beginContact(this);
     }
-    if (wasTouching && !touching) {
-      listener.endContact(this);
-    }
     const sensor = false;
     if (!sensor && touching) {
       listener.preSolve(this);
+    }
+    if (wasTouching && !touching) {
+      listener.endContact(this);
     }
   }
 }
