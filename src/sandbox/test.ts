@@ -5,7 +5,7 @@ import { Contact } from '../classic2d/dynamics/contacts/contact';
 import { ContactListener } from '../classic2d/dynamics/world-callbacks';
 import { World } from '../classic2d/physics/world';
 
-export class Test<T = any> extends ContactListener<T> {
+export class Test<T = any> implements ContactListener<T> {
   private world: World;
   private debugDraw: DebugDraw;
   private contactListener?: void | ContactListener<T>;
@@ -16,12 +16,10 @@ export class Test<T = any> extends ContactListener<T> {
   private shouldMakeStep: boolean = false;
 
   constructor(world: World, debugDraw: DebugDraw, contactListener?: void | ContactListener<T>) {
-    super();
     this.world = world;
     this.debugDraw = debugDraw;
     this.contactListener = contactListener;
     this.world.setDebugDraw(this.debugDraw);
-    this.world.setContactListener(this);
     this.clearContacts();
   }
 

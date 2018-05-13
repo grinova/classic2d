@@ -2,6 +2,7 @@ import { appendDomElement, setCanvasSize } from './common/dom';
 import { Camera, DebugDraw } from './debug-draw';
 import { MovingAverage } from './moving-average';
 import { Test } from './test';
+import { SandboxWorld } from './world';
 import { ContactListener, World } from '../classic2d/classic2d';
 
 export function createSandbox(options: SandboxOptionsBase, parent: HTMLElement = document.body) {
@@ -66,13 +67,13 @@ export class Sandbox {
     setCanvasSize(this.canvas2d, width, height);
 
     this.camera = new Camera(0, 0, 0, width, height);
-    this.world = new World();
 
     this.gl = this.canvasWebgl.getContext('webgl') || this.canvasWebgl.getContext('experimental-webgl');
     const gl2d = this.canvas2d.getContext('2d');
 
     this.debugDraw = new DebugDraw(this.gl, gl2d, this.camera);
-    this.test = new Test(this.world, this.debugDraw);
+    const world = this.world = new SandboxWorld(this.debugDraw);
+    this.test = world.getTest();
     if (this.actions && this.actions.init) {
       this.actions.init(this.world, this);
     }
@@ -91,8 +92,11 @@ export class Sandbox {
     requestAnimationFrame(this.render);
   }
 
-  setContactListener(contactListener: ContactListener): void {
-    this.test.setContactListener(contactListener);
+  reset(): void {
+    this.world.clear();
+    if (this.actions && this.actions.reset) {
+      this.actions.reset(this.world, this);
+    }
   }
 
   stop(): void {
@@ -124,9 +128,7 @@ export class Sandbox {
   private handleKeyDown(event: KeyboardEvent): void {
     switch (event.key) {
       case 'r':
-        if (this.actions && this.actions.reset) {
-          this.actions.reset(this.world, this);
-        }
+        this.reset();
         break;
       case 'p':
         this.test.pause();

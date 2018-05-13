@@ -1,7 +1,7 @@
 import { Contact } from './contacts/contact';
 
-export abstract class ContactListener<T = any> {
-  abstract beginContact(contact: Contact<T>): void;
-  abstract endContact(contact: Contact<T>): void;
-  abstract preSolve(contact: Contact<T>): void;
+export interface ContactListener<T = any> {
+  beginContact(contact: Contact<T>): void;
+  endContact(contact: Contact<T>): void;
+  preSolve(contact: Contact<T>): void;
 }

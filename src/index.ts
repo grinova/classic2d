@@ -36,7 +36,6 @@ namespace classic2d {
   export type Contact<T = any> = _Contact<T>;
   export const ContactFlags = _ContactFlags;
   export type ContactFlags = _ContactFlags;
-  export const ContactListener = _ContactListener;
   export type ContactListener<T = any> = _ContactListener<T>;
   export const ContactManager = _ContactManager;
   export type ContactManager<T = any> = _ContactManager<T>;

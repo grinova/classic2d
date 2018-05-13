@@ -3,7 +3,7 @@ import {
   ContactListener as BaseContactListener
 } from '../classic2d/classic2d';
 
-export class ContactListener<T = any> extends BaseContactListener<T> {
+export class ContactListener<T = any> implements BaseContactListener<T> {
   on: boolean = false;
 
   beginContact(contact: Contact): void {
