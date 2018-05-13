@@ -1,4 +1,5 @@
 import { Color as _Color, COLOR_COMPONENTS as _COLOR_COMPONENTS } from './classic2d/common/color';
+import { COLORS as _COLORS } from './classic2d/common/settings';
 import { ContactManager as _ContactManager } from './classic2d/dynamics/contact-manager';
 import { Contact as _Contact, ContactFlags as _ContactFlags } from './classic2d/dynamics/contacts/contact';
 import { ContactListener as _ContactListener } from './classic2d/dynamics/world-callbacks';
@@ -15,12 +16,6 @@ import { BodyDef as _BodyDef } from './classic2d/physics/body-def';
 import { FixtureDef as _FixtureDef } from './classic2d/physics/fixture-def';
 import { CircleShape as _CircleShape } from './classic2d/physics/shapes/circle-shape';
 import { World as _World } from './classic2d/physics/world';
-import {
-  createSandbox as _createSandbox,
-  Sandbox as _Sandbox,
-  SandboxOptions as _SandboxOptions,
-  SandboxOptionsBase as _SandboxOptionsBase
-} from './sandbox/sandbox';
 
 namespace classic2d {
   export const Body = _Body;
@@ -31,6 +26,7 @@ namespace classic2d {
   export const CircleShape = _CircleShape;
   export type CircleShape = _CircleShape;
   export type Color = _Color;
+  export const COLORS = _COLORS;
   export const COLOR_COMPONENTS = _COLOR_COMPONENTS;
   export const Contact = _Contact;
   export type Contact<T = any> = _Contact<T>;
@@ -53,11 +49,6 @@ namespace classic2d {
   export type Vec2 = _Vec2;
   export const World = _World;
   export type World<T = any> = _World<T>;
-  export const createSandbox = _createSandbox;
-  export const Sandbox = _Sandbox;
-  export type Sandbox = _Sandbox;
-  export type SandboxOptions = _SandboxOptions;
-  export type SandboxOptionsBase = _SandboxOptionsBase;
 }
 
 export = classic2d;
