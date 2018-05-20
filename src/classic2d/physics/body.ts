@@ -2,7 +2,6 @@ import { BodyDef } from './body-def';
 import { Fixture } from './fixture';
 import { FixtureDef } from './fixture-def';
 import { MassData } from './mass-data';
-import { CircleShape } from './shapes/circle-shape';
 import { Mat4, Rot, Sweep, Transform, Vec2 } from '../math/common';
 
 export enum BodyType {

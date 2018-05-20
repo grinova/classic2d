@@ -1,7 +1,6 @@
 import { Contact } from './contacts/contact';
 import { ContactListener } from './world-callbacks';
 import { testOverlap } from '../collision/collision';
-import { Vec2 } from '../math/common';
 import { Body } from '../physics/body';
 import { World } from '../physics/world';
 

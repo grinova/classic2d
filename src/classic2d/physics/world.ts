@@ -9,7 +9,7 @@ import { ContactManager } from '../dynamics/contact-manager';
 import { ContactSolver } from '../dynamics/contacts/contact-solver';
 import { ContactListener } from '../dynamics/world-callbacks';
 import { Draw } from '../graphics/common/draw';
-import { Mat4, Transform, Vec2 } from '../math/common';
+import { Mat4 } from '../math/common';
 
 const enum Flags {
   newBodies = 1,
