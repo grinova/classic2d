@@ -16,7 +16,7 @@ export class Body<T = any> {
   force: Vec2 = new Vec2();
   torque: number = 0;
   sweep: Sweep = new Sweep();
-  userData: T;
+  userData?: T;
 
   private massData: MassData;
   private fixture: Fixture;
