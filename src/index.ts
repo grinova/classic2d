@@ -1,5 +1,6 @@
 import { Color as _Color, COLOR_COMPONENTS as _COLOR_COMPONENTS } from './classic2d/common/color';
 import { COLORS as _COLORS } from './classic2d/common/settings';
+import { TimeDelta as _TimeDelta } from './classic2d/common/time';
 import { ContactManager as _ContactManager } from './classic2d/dynamics/contact-manager';
 import { Contact as _Contact, ContactFlags as _ContactFlags } from './classic2d/dynamics/contacts/contact';
 import { ContactListener as _ContactListener } from './classic2d/dynamics/world-callbacks';
@@ -43,6 +44,7 @@ namespace classic2d {
   export type Rot = _Rot;
   export const Sweep = _Sweep;
   export type Sweep = _Sweep;
+  export type TimeDelta = _TimeDelta;
   export const Transform = _Transform;
   export type Transform = _Transform;
   export const Vec2 = _Vec2;

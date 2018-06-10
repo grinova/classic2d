@@ -5,6 +5,7 @@ import { CircleShape } from './shapes/circle-shape';
 import { ShapeType } from './shapes/shape';
 import { Color } from '../common/color';
 import { COLORS } from '../common/settings';
+import { TimeDelta } from '../common/time';
 import { ContactManager } from '../dynamics/contact-manager';
 import { ContactSolver } from '../dynamics/contacts/contact-solver';
 import { ContactListener } from '../dynamics/world-callbacks';
@@ -87,7 +88,7 @@ export class World<T = any> {
     this.draw = draw;
   }
 
-  step(time: number): void {
+  step(time: TimeDelta): void {
     if (time > 100) {
       return;
     }
