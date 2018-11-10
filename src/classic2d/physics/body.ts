@@ -90,6 +90,14 @@ export class Body<T = any> {
     return this.xf.rot.copy();
   }
 
+  setAngle(angle: number): void {
+    this.xf.rot.setAngle(angle);
+  }
+
+  setPosition(pos: Vec2): void {
+    this.xf.pos.set(pos.x, pos.y);
+  }
+
   setTorque(torque: number): void {
     this.torque = torque;
   }
