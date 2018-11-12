@@ -70,6 +70,10 @@ export class World<T = any> {
           break;
       }
     }
+    const contacts = this.contactManager.getContacts();
+    for (const contact of contacts) {
+      this.draw.drawPoint(contact.getPoint(), COLORS.CONTACT);
+    }
   }
 
   getBodies(): Body<T>[] {
