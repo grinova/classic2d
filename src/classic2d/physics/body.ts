@@ -2,7 +2,7 @@ import { BodyDef } from './body-def';
 import { Fixture } from './fixture';
 import { FixtureDef } from './fixture-def';
 import { MassData } from './mass-data';
-import { Mat4, Rot, Sweep, Transform, Vec2 } from '../math/common';
+import { Rot, Sweep, Transform, Vec2 } from '../math/common';
 
 export enum BodyType {
   static,
@@ -72,14 +72,6 @@ export class Body<T = any> {
 
   getMassData(): MassData {
     return this.massData;
-  }
-
-  getModelMatrix(): Mat4 {
-    const matrix = new Mat4();
-    const { pos, rot } = this.xf;
-    matrix.translate(pos.x, pos.y);
-    matrix.rotate(rot.getAngle());
-    return matrix;
   }
 
   getPosition(): Vec2 {

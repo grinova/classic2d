@@ -1,6 +1,5 @@
 import { Body, BodyType } from './body';
 import { BodyDef } from './body-def';
-import { Fixture } from './fixture';
 import { CircleShape } from './shapes/circle-shape';
 import { ShapeType } from './shapes/shape';
 import { Color } from '../common/color';
@@ -10,7 +9,6 @@ import { ContactManager } from '../dynamics/contact-manager';
 import { ContactSolver } from '../dynamics/contacts/contact-solver';
 import { ContactListener } from '../dynamics/world-callbacks';
 import { Draw } from '../graphics/common/draw';
-import { Mat4 } from '../math/common';
 
 const enum Flags {
   newBodies = 1,
@@ -59,14 +57,12 @@ export class World<T = any> {
       return;
     }
     for (const body of this.bodies) {
-      const matrix = body.getModelMatrix();
-      const fixture = body.getFixture();
       switch (body.type) {
         case BodyType.dynamic:
-          this.drawShape(fixture, matrix, COLORS.DYNAMIC);
+          this.drawBody(body, COLORS.DYNAMIC);
           break;
         case BodyType.static:
-          this.drawShape(fixture, matrix, COLORS.STATIC);
+          this.drawBody(body, COLORS.STATIC);
           break;
       }
     }
@@ -137,18 +133,18 @@ export class World<T = any> {
     }
   }
 
-  private drawShape(fixture: Fixture, matrix: Mat4, color: Color) {
+  private drawBody(body: Body, color: Color) {
     if (!this.draw) {
       return;
     }
+    const fixture = body.getFixture();
     switch (fixture.getType()) {
       case ShapeType.Circle:
+        const position = body.getPosition();
+        const angle = body.getAngle();
         const circle = fixture.getShape() as CircleShape;
-        this.draw.drawCircle(matrix, circle.radius, color);
+        this.draw.drawCircle(position, angle, circle.radius, color);
         break;
-      // case ShapeType.Polygon:
-      //   const polygon = fixture.getShape() as PolygonShape;
-      //   this.draw.drawPolygon(matrix, polygon.vertices, color);
     }
   }
 }
